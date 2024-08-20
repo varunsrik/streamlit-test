@@ -76,7 +76,7 @@ with tab4:
     
     # Create a figure with 3 rows and shared x-axis
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
-                        row_heights=[0.4, 0.2, 0.2, 0.2], vertical_spacing=0.1)
+                        row_heights=[0.3, 0.15, 0.2, 0.2], vertical_spacing=0.15)
     
     # Add candlestick chart
     fig.add_trace(go.Candlestick(
