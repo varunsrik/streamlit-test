@@ -7,6 +7,9 @@ Created on Tue Aug 20 11:28:19 2024
 """
 import streamlit as st
 import pandas as pd
+import numpy as np
+import datetime as dt
+import yfinance as yf
 
 
 st.header('Test App')
