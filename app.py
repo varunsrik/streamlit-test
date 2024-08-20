@@ -66,7 +66,7 @@ with tab4:
     cols = ['open', 'high', 'low', 'close', 'delivery_pct', 'f30d_basis_pct', 'open_interest']
     cols = [selected_stock+'_'+col for col in cols]
     stock_df_slice = stock_df[cols]
-    stock_df_slice.columns = stock_df_slice.columns.str.lstrip(symbol+'_')
+    stock_df_slice.columns = stock_df_slice.columns.str.lstrip(selected_stock+'_')
 
     df_last_year = stock_df_slice.loc['Mar-2024':]
 
