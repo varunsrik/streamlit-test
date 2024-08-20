@@ -18,7 +18,7 @@ days = pd.read_csv('trading_days.csv', index_col = 0)
 days.index = pd.to_datetime(days.index)
 current_date = days.index[-1]
 
-st.header(f'FNO Dashboard for {current_date}')
+st.header(f'FNO Dashboard for {{current_date.day_name()}, str(current_date.day)} {current_date.month_name()} {str(current_date.year)}')
 
 tab1, tab2, tab3, tab4 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details"])
 
