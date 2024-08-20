@@ -50,5 +50,10 @@ with tab2:
 with tab3:
     industry_df = pd.read_csv('industry_table.csv', index_col = 0)
     st.dataframe(industry_df)
+    ind_button = st.selectbox('Select Industry', industry_df.index)
+    if ind_button:
+        sub_ind_df = pd.read_csv(f'industry_sub_{ind_button}_table.csv', index_col = 0)
+        st.dataframe(sub_ind_df)
+    
 
         
