@@ -111,7 +111,7 @@ with tab4:
         y=df_last_year['delivery_pct'],
         mode='lines',
         name='Delivery Percentage'
-    ), row=3, col=1)
+    ), row=4, col=1)
 
 
     
