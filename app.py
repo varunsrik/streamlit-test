@@ -5,9 +5,9 @@ Created on Tue Aug 20 11:28:19 2024
 
 @author: varun
 """
-
+st.header('Test App')
 # Load the CSV file
-df = pd.read_csv('trading_days_list.csv')
+df = pd.read_csv('trading_days.csv')
 
 # Display the dataframe
 st.write("## Trading Days List")
