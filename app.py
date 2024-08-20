@@ -11,7 +11,6 @@ import numpy as np
 import datetime as dt
 import yfinance as yf
 import plotly
-from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
 
@@ -76,7 +75,7 @@ with tab4:
     
     
     # Create a figure with 3 rows and shared x-axis
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
+    fig = plotly.subplots.make_subplots(rows=3, cols=1, shared_xaxes=True, 
                         row_heights=[0.3, 0.2, 0.2], vertical_spacing=0.15)
     
     # Add candlestick chart
