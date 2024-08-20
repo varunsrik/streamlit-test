@@ -75,8 +75,8 @@ with tab4:
     
     
     # Create a figure with 3 rows and shared x-axis
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
-                        row_heights=[0.3, 0.2, 0.2], vertical_spacing=0.15)
+    fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
+                        row_heights=[0.3, 0.2, 0.2, 0.2], vertical_spacing=0.15)
     
     # Add candlestick chart
     fig.add_trace(go.Candlestick(
@@ -103,6 +103,17 @@ with tab4:
         mode='lines',
         name='Open Interest'
     ), row=3, col=1)
+
+    # Add delivery percent plot
+
+    fig.add_trace(go.Scatter(
+        x=df_last_year.index,
+        y=df_last_year['delivery_pct'],
+        mode='lines',
+        name='Delivery Percentage'
+    ), row=3, col=1)
+
+
     
     # Update layout
     fig.update_layout(
@@ -115,7 +126,9 @@ with tab4:
         xaxis2=dict(rangeslider=dict(visible=False), title='Date'),
         yaxis2=dict(title='Futures Basis'),
         xaxis3=dict(rangeslider=dict(visible=False), title='Date'),
-        yaxis3=dict(title='Open Interest')
+        yaxis3=dict(title='Open Interest'),
+          xaxis4=dict(rangeslider=dict(visible=False), title='Date'),
+        yaxis4=dict(title='Delivery Percent')
        #t , xaxis_rangeslider_visible=True 
     )
     
