@@ -10,6 +10,9 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import yfinance as yf
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
 
 days = pd.read_csv('trading_days.csv', index_col = 0)
 days.index = pd.to_datetime(days.index)
@@ -54,6 +57,78 @@ with tab3:
     if ind_button:
         sub_ind_df = pd.read_csv(f'industry_sub_{ind_button}_table.csv', index_col = 0)
         st.dataframe(sub_ind_df)
+
+with tab4:
+    stock_df = pd.read_csv('stock_table.csv', index_col = 0)
+    stock_df.index = pd.to_datetime(stock_df.index)
     
+    selected_stock = st.selectbox('Select a stock:', backwardation_df.index)
+    cols = ['open', 'high', 'low', 'close', 'delivery_pct', 'f30d_basis_pct', 'open_interest']
+    cols = [selected_stock+'_'+col for col in cols]
+    stock_df_slice = stock_df[cols]
+    stock_df_slice.columns = stock_df_slice.columns.str.lstrip(symbol+'_')
+
+    df_last_year = stock_df_slice.loc['Mar-2024':]
+
+    st.dataframe(df_last_year)
+    
+    
+    
+    # Create a figure with 3 rows and shared x-axis
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
+                        row_heights=[0.3, 0.2, 0.2], vertical_spacing=0.15)
+    
+    # Add candlestick chart
+    fig.add_trace(go.Candlestick(
+        x=df_last_year.index,
+        open=df_last_year['open'],
+        high=df_last_year['high'],
+        low=df_last_year['low'],
+        close=df_last_year['close'],
+        name='Candlestick'
+    ), row=1, col=1)
+    
+    # Add futures_basis plot
+    fig.add_trace(go.Scatter(
+        x=df_last_year.index,
+        y=df_last_year['f30d_basis_pct'],
+        mode='lines',
+        name='Futures Basis'
+    ), row=2, col=1)
+    
+    # Add open_interest plot
+    fig.add_trace(go.Scatter(
+        x=df_last_year.index,
+        y=df_last_year['open_interest'],
+        mode='lines',
+        name='Open Interest'
+    ), row=3, col=1)
+    
+    # Update layout
+    fig.update_layout(
+        title='Stock Data Visualization',
+        xaxis=dict( rangeslider=dict(
+             visible=True,  # Show the range slider
+             thickness=0.1  # Adjust the thickness so it doesn't obscure the subplots
+         ), title='Date'),
+        yaxis=dict(title='Price'),
+        xaxis2=dict(rangeslider=dict(visible=False), title='Date'),
+        yaxis2=dict(title='Futures Basis'),
+        xaxis3=dict(rangeslider=dict(visible=False), title='Date'),
+        yaxis3=dict(title='Open Interest')
+       #t , xaxis_rangeslider_visible=True 
+    )
+    
+    # Adjust x-axis labels visibility
+    fig.update_xaxes(showticklabels=False, row=1, col=1)
+    fig.update_xaxes(showticklabels=False, row=2, col=1)
+    
+    # Adjust margins
+    fig.update_layout(margin=dict(l=0, r=0, t=4, b=0))
+    
+    # Display the combined chart
+    st.plotly_chart(fig, use_container_width=True)
+
+        
 
         
