@@ -11,11 +11,44 @@ import numpy as np
 import datetime as dt
 import yfinance as yf
 
+days = pd.read_csv('trading_days.csv', index_col = 0)
+days.index = pd.to_datetime(days.index)
+current_date = days.index[-1]
 
-st.header('Test App')
-# Load the CSV file
-df = pd.read_csv('trading_days.csv')
+st.header(f'FNO Dashboard for {current_date}')
 
-# Display the dataframe
-st.write("## Trading Days List")
-st.dataframe(df)
+tab1, tab2, tab3, tab4 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details"])
+
+with tab1:
+    expiry_df = pd.read_csv('expiry_table.csv', index_col = 0)
+    st.dataframe(expiry_df)
+    
+    oi_up_backwardation = expiry_df[(expiry_df['oi_pct_change']>0)&(expiry_df['current_basis']<0)]
+    oi_down_backwardation = expiry_df[(expiry_df['oi_pct_change']<0)&(expiry_df['current_basis']<0)]
+    oi_up_contango = expiry_df[(expiry_df['oi_pct_change']>0)&(expiry_df['current_basis']>0)]
+    oi_down_contango = expiry_df[(expiry_df['oi_pct_change']<0)&(expiry_df['current_basis']>0)]
+    
+    st.subheader('OI ⬆️ and Basis is 🔻')
+    st.dataframe(oi_up_backwardation)
+  
+    st.subheader('OI ⬇️ and Basis is 🔻')
+    st.dataframe(oi_down_backwardation)
+    
+    st.subheader('OI ⬆️ and Basis is ⬆️')
+    st.dataframe(oi_up_contango)
+
+    st.subheader('OI ⬇️ and Basis is ⬆️')
+    st.dataframe(oi_down_contango)
+    
+
+with tab2:
+    backwardation_df = pd.read_csv('backwardation_table.csv', index_col = 0)
+    st.dataframe(backwardation_df)
+    
+
+    
+with tab3:
+    industry_df = pd.read_csv('industry_table.csv', index_col = 0)
+    st.dataframe(industry_df)
+
+        
