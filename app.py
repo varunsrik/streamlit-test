@@ -183,8 +183,10 @@ for symbol in final.index:
         
 st.dataframe(final)
 
-
-st.subheader('NIFTY FNO Stocks')
+for criterion in ['252 day high', '100 day high', '50 day high']:
+    temp = final[final['high_low_signal'] == criterion]
+    st.subheader(f'Stocks Making a {criterion}')
+    st.dataframe(temp)
 
 #fno_final = final.loc[fno_stocks]
 #st.dataframe(fno_final)
