@@ -143,7 +143,7 @@ with tab4:
     st.plotly_chart(fig, use_container_width=True)
 
 with tab5:
-    @st.cache
+    @st.cache_data
     def yf_downloader(symbol_list, date):
         symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
         df = yf.download(symbol_list_yf, start = '2023-1-1')['Adj Close']
@@ -154,6 +154,7 @@ symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
 df = yf_downloader(symbol_list, current_date)
 
 today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
+today_datetime += dt.timedelta(hours = 5, minutes = 30)
 st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
 st.subheader('Nifty 500 List')
 final = pd.DataFrame(index = df.columns, columns = ['high_low_signal'])
