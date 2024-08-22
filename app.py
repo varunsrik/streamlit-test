@@ -153,6 +153,9 @@ symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
 
 df = yf_downloader(symbol_list, current_date)
 
+today_datetime = dt.datetime.today()
+st.header(f'Live Momentum Screen for {dt.datetime.today().strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)} {today_datetime.month_name()} {str(today_datetime.year)}
+st.subheader('Nifty 500 List')
 final = pd.DataFrame(index = df.columns, columns = ['high_low_signal'])
 final['high_low_signal'] = np.where(
     df.iloc[-1]>=df.rolling(252).max().iloc[-1], '252 day high', 
@@ -166,4 +169,7 @@ final['high_low_signal'] = np.where(
                       np.where(df.iloc[-1]<=df.rolling(20).min().iloc[-1], '20 day low',
                                np.where(df.iloc[-1]<=df.rolling(5).min().iloc[-1], '5 day low', '-')
                                )))))))))
-st.dataframe(final)
+st.subheader('NIFTY FNO Stocks')
+fno_stocks = expiry_df.index
+fno_final = final.loc[fno_stocks]
+st.dataframe(fno_final)
