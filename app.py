@@ -20,7 +20,7 @@ current_date = days.index[-1]
 
 st.header(f'FNO Dashboard for {current_date.day_name()}, {str(current_date.day)} {current_date.month_name()} {str(current_date.year)}')
 
-tab1, tab2, tab3, tab4 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens"])
 
 with tab1:
     expiry_df = pd.read_csv('expiry_table.csv', index_col = 0)
@@ -142,6 +142,28 @@ with tab4:
     # Display the combined chart
     st.plotly_chart(fig, use_container_width=True)
 
-        
+with tab5:
+    @st.cache
+    def yf_downloader(symbol_list, date):
+        symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
+        df = yf.download(symbol_list_yf, start = '2023-1-1')['Adj Close']
+        df.columns = symbol_list
+        return df
+symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
 
-        
+df = yf_downloader(symbol_list, current_date)
+
+final = pd.DataFrame(index = df.columns, columns = ['high_low_signal'])
+final['high_low_signal'] = np.where(
+    df.iloc[-1]>=df.rolling(252).max().iloc[-1], '252 day high', 
+    np.where(df.iloc[-1]>=df.rolling(100).max().iloc[-1], '100 day high',
+             np.where(df.iloc[-1]>=df.rolling(50).max().iloc[-1], '50 day high',
+                      np.where(df.iloc[-1]>=df.rolling(20).max().iloc[-1], '20 day high',
+                               np.where(df.iloc[-1]>=df.rolling(5).max().iloc[-1], '5 day high',
+                      np.where(df.iloc[-1]<=df.rolling(252).min().iloc[-1], '252 day low',
+                      np.where(df.iloc[-1]<=df.rolling(100).min().iloc[-1], '100 day low',
+                               np.where(df.iloc[-1]<=df.rolling(50).min().iloc[-1], '50 day low',
+                      np.where(df.iloc[-1]<=df.rolling(20).min().iloc[-1], '20 day low',
+                               np.where(df.iloc[-1]<=df.rolling(5).min().iloc[-1], '5 day low', '-')
+                               )))))))))
+st.dataframe(final)
