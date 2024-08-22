@@ -169,7 +169,10 @@ final['high_low_signal'] = np.where(
                       np.where(df.iloc[-1]<=df.rolling(20).min().iloc[-1], '20 day low',
                                np.where(df.iloc[-1]<=df.rolling(5).min().iloc[-1], '5 day low', '-')
                                )))))))))
+st.dataframe(final)
+
 st.subheader('NIFTY FNO Stocks')
 fno_stocks = expiry_df.index
+fno_stocks = fno_stocks.intersection(final.index)
 fno_final = final.loc[fno_stocks]
 st.dataframe(fno_final)
