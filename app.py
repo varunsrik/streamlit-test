@@ -154,7 +154,7 @@ symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
 df = yf_downloader(symbol_list, current_date)
 
 today_datetime = dt.datetime.today()
-st.header(f'Live Momentum Screen for {dt.datetime.today().strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
+st.header(f'Live Momentum Screen for {dt.datetime.today().strftime('%H:%M')}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
 st.subheader('Nifty 500 List')
 final = pd.DataFrame(index = df.columns, columns = ['high_low_signal'])
 final['high_low_signal'] = np.where(
