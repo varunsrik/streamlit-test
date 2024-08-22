@@ -179,7 +179,7 @@ fno_stocks = fno_stocks.intersection(final.index)
 
 for symbol in final.index:
     if symbol in fno_stocks:
-        final['fno'] =True
+        final.loc[symbol, 'fno'] =True
         
 st.dataframe(final)
 
