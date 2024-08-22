@@ -183,7 +183,7 @@ for symbol in final.index:
         
 st.dataframe(final)
 
-for criterion in ['252 day high', '100 day high', '50 day high', ''20 day high', '5 day high', 
+for criterion in ['252 day high', '100 day high', '50 day high', '20 day high', '5 day high', 
 '252 day low', '100 day low', '50 day low', '20 day low', '5 day low']:
     temp = final[final['high_low_signal'] == criterion]
     if len(temp)>0:
