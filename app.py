@@ -147,7 +147,7 @@ with tab5:
     def yf_downloader(symbol_list, date):
         symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
         df = yf.download(symbol_list_yf, start = '2023-1-1')['Adj Close']
-        df.columns = symbol_list
+        df.columns = df.columns.str.rstrip('.NS')
         return df
 symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
 
@@ -169,10 +169,17 @@ final['high_low_signal'] = np.where(
                       np.where(df.iloc[-1]<=df.rolling(20).min().iloc[-1], '20 day low',
                                np.where(df.iloc[-1]<=df.rolling(5).min().iloc[-1], '5 day low', '-')
                                )))))))))
-st.dataframe(final)
 
-st.subheader('NIFTY FNO Stocks')
+for window in [1,3,5,10,20,60]:
+    final[f'{str(window)}d_return'] = (df.iloc[-1] - df.iloc[-1-window])*100/df.iloc[-1-window]
 fno_stocks = expiry_df.index
 fno_stocks = fno_stocks.intersection(final.index)
-fno_final = final.loc[fno_stocks]
-st.dataframe(fno_final)
+final['is_fno'] = False
+for symbol in fno_stocks:
+    final.loc[symbol, 'is_fno'] = True
+st.dataframe(final)
+
+for criterion in ['252 day high', '100 day high', '50 day high', '20 day high', '5 day high', '252 day low', '100 day low', '50 day low', '20 day low', '5 day low']:
+    st.subheader(f'Stocks making a new {criterion}')
+    temp = final[final['high_low_signal'] == criterion]
+    st.dataframe(temp)
