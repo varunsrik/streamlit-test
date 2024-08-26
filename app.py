@@ -145,7 +145,7 @@ with tab4:
 
 with tab5:
     @st.cache_data   
-    def yf_downloader(symbol_list, date, time):
+    def yf_downloader(symbol_list):
         symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
         df = yf.download(symbol_list_yf, start = '2023-1-1')[['Adj Close', 'Volume']]
         close_df, volume_df = df['Adj Close'], df['Volume']
@@ -154,69 +154,43 @@ with tab5:
         volume_df.columns = volume_df.columns.str.rstrip('.NS')
         return [close_df, volume_df]
         
-    start_time = dt.time(9, 15)  # Start at 9:15 AM
-    end_time = dt.time(15, 30)   # End at 3:30 PM
-
-    time_list = []
-    current_time = dt.datetime.combine(dt.date.today(), start_time)
-
-    while current_time.time() <= end_time:
-        time_list.append(current_time.time())
-        current_time += dt.timedelta(minutes=15)
-        
-    current_time = dt.datetime.today().time() 
-
-    def closest_time(time_list, current_time):
-        closest = None
-        for t in time_list:
-            if t <= current_time:
-                closest = t
-            else:
-                break
-        return closest
-    
-    symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
-
-    #while (dt.datetime.today().time() < dt.time(15,30)) & (dt.datetime.today().time() > dt.time(9,15)):
-    while True:
     # Get the closest time
-        closest = closest_time(time_list, current_time)
-        result = yf_downloader(symbol_list, current_date, closest)
-        close_df = result[0]
-        volume_df = result[1]
-        volume_series = volume_df.iloc[-1]
-        st.write(volume_df)
-        today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
-        st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
-        st.subheader('Nifty 500 List')
-        final = pd.DataFrame(index = close_df.columns, columns = ['high_low_signal'])
-        final['high_low_signal'] = np.where(
-            close_df.iloc[-1]>=close_df.rolling(252).max().iloc[-1], '252 day high', 
-            np.where(close_df.iloc[-1]>=close_df.rolling(100).max().iloc[-1], '100 day high',
-                     np.where(close_df.iloc[-1]>=close_df.rolling(50).max().iloc[-1], '50 day high',
-                              np.where(close_df.iloc[-1]>=close_df.rolling(20).max().iloc[-1], '20 day high',
-                                       np.where(close_df.iloc[-1]>=close_df.rolling(5).max().iloc[-1], '5 day high',
-                              np.where(close_df.iloc[-1]<=close_df.rolling(252).min().iloc[-1], '252 day low',
-                              np.where(close_df.iloc[-1]<=close_df.rolling(100).min().iloc[-1], '100 day low',
-                                       np.where(close_df.iloc[-1]<=close_df.rolling(50).min().iloc[-1], '50 day low',
-                              np.where(close_df.iloc[-1]<=close_df.rolling(20).min().iloc[-1], '20 day low',
-                                       np.where(close_df.iloc[-1]<=close_df.rolling(5).min().iloc[-1], '5 day low', '-')
-                                       )))))))))
-        
-        for window in [1,3,5,10,20,60]:
-            final[f'{str(window)}d_return'] = round((close_df.iloc[-1] - close_df.iloc[-1-window])*100/close_df.iloc[-1-window],2)
-        for symbol in final.index:
-            final['volume_signal'] = volume_series.loc[symbol]
-        fno_stocks = expiry_df.index
-        fno_stocks = fno_stocks.intersection(final.index)
-        final['is_fno'] = False
-        for symbol in fno_stocks:
-            final.loc[symbol, 'is_fno'] = True
-        st.dataframe(final)
-        
-        for criterion in ['252 day high', '100 day high', '50 day high', '20 day high', '5 day high', '252 day low', '100 day low', '50 day low', '20 day low', '5 day low']:
-            temp = final[final['high_low_signal'] == criterion]
-            if len(temp) > 0:
-                st.subheader(f'Stocks making a new {criterion}')  
-                st.dataframe(temp)
-        time.sleep(600)
+    result = yf_downloader(symbol_list)
+    close_df = result[0]
+    volume_df = result[1]
+    volume_series = volume_df.iloc[-1]
+    st.write(volume_df)
+    today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
+    st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
+    st.subheader('Nifty 500 List')
+    final = pd.DataFrame(index = close_df.columns, columns = ['high_low_signal'])
+    final['high_low_signal'] = np.where(
+        close_df.iloc[-1]>=close_df.rolling(252).max().iloc[-1], '252 day high', 
+        np.where(close_df.iloc[-1]>=close_df.rolling(100).max().iloc[-1], '100 day high',
+                 np.where(close_df.iloc[-1]>=close_df.rolling(50).max().iloc[-1], '50 day high',
+                          np.where(close_df.iloc[-1]>=close_df.rolling(20).max().iloc[-1], '20 day high',
+                                   np.where(close_df.iloc[-1]>=close_df.rolling(5).max().iloc[-1], '5 day high',
+                          np.where(close_df.iloc[-1]<=close_df.rolling(252).min().iloc[-1], '252 day low',
+                          np.where(close_df.iloc[-1]<=close_df.rolling(100).min().iloc[-1], '100 day low',
+                                   np.where(close_df.iloc[-1]<=close_df.rolling(50).min().iloc[-1], '50 day low',
+                          np.where(close_df.iloc[-1]<=close_df.rolling(20).min().iloc[-1], '20 day low',
+                                   np.where(close_df.iloc[-1]<=close_df.rolling(5).min().iloc[-1], '5 day low', '-')
+                                   )))))))))
+    
+    for window in [1,3,5,10,20,60]:
+        final[f'{str(window)}d_return'] = round((close_df.iloc[-1] - close_df.iloc[-1-window])*100/close_df.iloc[-1-window],2)
+    for symbol in final.index:
+        final['volume_signal'] = volume_series.loc[symbol]
+    fno_stocks = expiry_df.index
+    fno_stocks = fno_stocks.intersection(final.index)
+    final['is_fno'] = False
+    for symbol in fno_stocks:
+        final.loc[symbol, 'is_fno'] = True
+    st.dataframe(final)
+    
+    for criterion in ['252 day high', '100 day high', '50 day high', '20 day high', '5 day high', '252 day low', '100 day low', '50 day low', '20 day low', '5 day low']:
+        temp = final[final['high_low_signal'] == criterion]
+        if len(temp) > 0:
+            st.subheader(f'Stocks making a new {criterion}')  
+            st.dataframe(temp)
+ 
