@@ -144,13 +144,16 @@ with tab4:
     st.plotly_chart(fig, use_container_width=True)
 
 with tab5:
-    @st.cache_data
+    @st.cache_data   
     def yf_downloader(symbol_list, date, time):
         symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
-        df = yf.download(symbol_list_yf, start = '2023-1-1')['Adj Close']
-        df.columns = df.columns.str.rstrip('.NS')
-        return df
-    
+        df = yf.download(symbol_list_yf, start = '2023-1-1')[['Adj Close', 'Volume']]
+        close_df, volume_df = df['Adj Close'], df['Volume']
+        volume_df = volume_df.apply(lambda x: round(x/x.rolling(20).mean(),1))
+        close_df.columns = close_df.columns.str.rstrip('.NS')
+        volume_df.columns = volume_df.columns.str.rstrip('.NS')
+        return [close_df, volume_df]
+        
     start_time = dt.time(9, 15)  # Start at 9:15 AM
     end_time = dt.time(15, 30)   # End at 3:30 PM
 
@@ -178,28 +181,32 @@ with tab5:
     while True:
     # Get the closest time
         closest = closest_time(time_list, current_time)
-        df = yf_downloader(symbol_list, current_date, closest)
-    
+        result = yf_downloader(symbol_list, current_date, closest)
+        close_df = result[0]
+        volume_df = result[1]
+        volume_series = volume_df.iloc[-1]
         
         today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
         st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
         st.subheader('Nifty 500 List')
-        final = pd.DataFrame(index = df.columns, columns = ['high_low_signal'])
+        final = pd.DataFrame(index = close_df.columns, columns = ['high_low_signal'])
         final['high_low_signal'] = np.where(
-            df.iloc[-1]>=df.rolling(252).max().iloc[-1], '252 day high', 
-            np.where(df.iloc[-1]>=df.rolling(100).max().iloc[-1], '100 day high',
-                     np.where(df.iloc[-1]>=df.rolling(50).max().iloc[-1], '50 day high',
-                              np.where(df.iloc[-1]>=df.rolling(20).max().iloc[-1], '20 day high',
-                                       np.where(df.iloc[-1]>=df.rolling(5).max().iloc[-1], '5 day high',
-                              np.where(df.iloc[-1]<=df.rolling(252).min().iloc[-1], '252 day low',
-                              np.where(df.iloc[-1]<=df.rolling(100).min().iloc[-1], '100 day low',
-                                       np.where(df.iloc[-1]<=df.rolling(50).min().iloc[-1], '50 day low',
-                              np.where(df.iloc[-1]<=df.rolling(20).min().iloc[-1], '20 day low',
-                                       np.where(df.iloc[-1]<=df.rolling(5).min().iloc[-1], '5 day low', '-')
+            close_df.iloc[-1]>=close_df.rolling(252).max().iloc[-1], '252 day high', 
+            np.where(close_df.iloc[-1]>=close_df.rolling(100).max().iloc[-1], '100 day high',
+                     np.where(close_df.iloc[-1]>=close_df.rolling(50).max().iloc[-1], '50 day high',
+                              np.where(close_df.iloc[-1]>=close_df.rolling(20).max().iloc[-1], '20 day high',
+                                       np.where(close_df.iloc[-1]>=close_df.rolling(5).max().iloc[-1], '5 day high',
+                              np.where(close_df.iloc[-1]<=close_df.rolling(252).min().iloc[-1], '252 day low',
+                              np.where(close_df.iloc[-1]<=close_df.rolling(100).min().iloc[-1], '100 day low',
+                                       np.where(close_df.iloc[-1]<=close_df.rolling(50).min().iloc[-1], '50 day low',
+                              np.where(close_df.iloc[-1]<=close_df.rolling(20).min().iloc[-1], '20 day low',
+                                       np.where(close_df.iloc[-1]<=close_df.rolling(5).min().iloc[-1], '5 day low', '-')
                                        )))))))))
         
         for window in [1,3,5,10,20,60]:
-            final[f'{str(window)}d_return'] = round((df.iloc[-1] - df.iloc[-1-window])*100/df.iloc[-1-window],2)
+            final[f'{str(window)}d_return'] = round((close_df.iloc[-1] - close_df.iloc[-1-window])*100/close_df.iloc[-1-window],2)
+        for symbol in final.index:
+            final['volume_signal'] = volume_series.loc[symbol]
         fno_stocks = expiry_df.index
         fno_stocks = fno_stocks.intersection(final.index)
         final['is_fno'] = False
@@ -208,7 +215,8 @@ with tab5:
         st.dataframe(final)
         
         for criterion in ['252 day high', '100 day high', '50 day high', '20 day high', '5 day high', '252 day low', '100 day low', '50 day low', '20 day low', '5 day low']:
-            st.subheader(f'Stocks making a new {criterion}')
             temp = final[final['high_low_signal'] == criterion]
-            st.dataframe(temp)
+            if len(temp) > 0:
+                st.subheader(f'Stocks making a new {criterion}')  
+                st.dataframe(temp)
         time.sleep(600)
