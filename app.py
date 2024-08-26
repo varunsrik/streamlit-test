@@ -171,7 +171,7 @@ final['high_low_signal'] = np.where(
                                )))))))))
 
 for window in [1,3,5,10,20,60]:
-    final[f'{str(window)}d_return'] = (df.iloc[-1] - df.iloc[-1-window])*100/df.iloc[-1-window]
+    final[f'{str(window)}d_return'] = round((df.iloc[-1] - df.iloc[-1-window])*100/df.iloc[-1-window],2)
 fno_stocks = expiry_df.index
 fno_stocks = fno_stocks.intersection(final.index)
 final['is_fno'] = False
