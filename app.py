@@ -155,6 +155,7 @@ with tab5:
         return [close_df, volume_df]
         
     # Get the closest time
+    symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
     result = yf_downloader(symbol_list)
     close_df = result[0]
     volume_df = result[1]
