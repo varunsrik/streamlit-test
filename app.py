@@ -12,6 +12,7 @@ import datetime as dt
 import yfinance as yf
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import time
 
 
 days = pd.read_csv('trading_days.csv', index_col = 0)
@@ -174,38 +175,40 @@ with tab5:
     symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
 
     #while (dt.datetime.today().time() < dt.time(15,30)) & (dt.datetime.today().time() > dt.time(9,15)):
+    while True:
     # Get the closest time
-    closest = closest_time(time_list, current_time)
-    df = yf_downloader(symbol_list, current_date, closest)
-
+        closest = closest_time(time_list, current_time)
+        df = yf_downloader(symbol_list, current_date, closest)
     
-    today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
-    st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
-    st.subheader('Nifty 500 List')
-    final = pd.DataFrame(index = df.columns, columns = ['high_low_signal'])
-    final['high_low_signal'] = np.where(
-        df.iloc[-1]>=df.rolling(252).max().iloc[-1], '252 day high', 
-        np.where(df.iloc[-1]>=df.rolling(100).max().iloc[-1], '100 day high',
-                 np.where(df.iloc[-1]>=df.rolling(50).max().iloc[-1], '50 day high',
-                          np.where(df.iloc[-1]>=df.rolling(20).max().iloc[-1], '20 day high',
-                                   np.where(df.iloc[-1]>=df.rolling(5).max().iloc[-1], '5 day high',
-                          np.where(df.iloc[-1]<=df.rolling(252).min().iloc[-1], '252 day low',
-                          np.where(df.iloc[-1]<=df.rolling(100).min().iloc[-1], '100 day low',
-                                   np.where(df.iloc[-1]<=df.rolling(50).min().iloc[-1], '50 day low',
-                          np.where(df.iloc[-1]<=df.rolling(20).min().iloc[-1], '20 day low',
-                                   np.where(df.iloc[-1]<=df.rolling(5).min().iloc[-1], '5 day low', '-')
-                                   )))))))))
-    
-    for window in [1,3,5,10,20,60]:
-        final[f'{str(window)}d_return'] = round((df.iloc[-1] - df.iloc[-1-window])*100/df.iloc[-1-window],2)
-    fno_stocks = expiry_df.index
-    fno_stocks = fno_stocks.intersection(final.index)
-    final['is_fno'] = False
-    for symbol in fno_stocks:
-        final.loc[symbol, 'is_fno'] = True
-    st.dataframe(final)
-    
-    for criterion in ['252 day high', '100 day high', '50 day high', '20 day high', '5 day high', '252 day low', '100 day low', '50 day low', '20 day low', '5 day low']:
-        st.subheader(f'Stocks making a new {criterion}')
-        temp = final[final['high_low_signal'] == criterion]
-        st.dataframe(temp)
+        
+        today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
+        st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
+        st.subheader('Nifty 500 List')
+        final = pd.DataFrame(index = df.columns, columns = ['high_low_signal'])
+        final['high_low_signal'] = np.where(
+            df.iloc[-1]>=df.rolling(252).max().iloc[-1], '252 day high', 
+            np.where(df.iloc[-1]>=df.rolling(100).max().iloc[-1], '100 day high',
+                     np.where(df.iloc[-1]>=df.rolling(50).max().iloc[-1], '50 day high',
+                              np.where(df.iloc[-1]>=df.rolling(20).max().iloc[-1], '20 day high',
+                                       np.where(df.iloc[-1]>=df.rolling(5).max().iloc[-1], '5 day high',
+                              np.where(df.iloc[-1]<=df.rolling(252).min().iloc[-1], '252 day low',
+                              np.where(df.iloc[-1]<=df.rolling(100).min().iloc[-1], '100 day low',
+                                       np.where(df.iloc[-1]<=df.rolling(50).min().iloc[-1], '50 day low',
+                              np.where(df.iloc[-1]<=df.rolling(20).min().iloc[-1], '20 day low',
+                                       np.where(df.iloc[-1]<=df.rolling(5).min().iloc[-1], '5 day low', '-')
+                                       )))))))))
+        
+        for window in [1,3,5,10,20,60]:
+            final[f'{str(window)}d_return'] = round((df.iloc[-1] - df.iloc[-1-window])*100/df.iloc[-1-window],2)
+        fno_stocks = expiry_df.index
+        fno_stocks = fno_stocks.intersection(final.index)
+        final['is_fno'] = False
+        for symbol in fno_stocks:
+            final.loc[symbol, 'is_fno'] = True
+        st.dataframe(final)
+        
+        for criterion in ['252 day high', '100 day high', '50 day high', '20 day high', '5 day high', '252 day low', '100 day low', '50 day low', '20 day low', '5 day low']:
+            st.subheader(f'Stocks making a new {criterion}')
+            temp = final[final['high_low_signal'] == criterion]
+            st.dataframe(temp)
+        time.sleep(600)
