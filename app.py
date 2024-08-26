@@ -144,14 +144,40 @@ with tab4:
 
 with tab5:
     @st.cache
-    def yf_downloader(symbol_list, date):
+    def yf_downloader(symbol_list, date, time):
         symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
         df = yf.download(symbol_list_yf, start = '2023-1-1')['Adj Close']
         df.columns = df.columns.str.rstrip('.NS')
         return df
-    symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
     
-    df = yf_downloader(symbol_list, current_date)
+    start_time = dt.time(9, 15)  # Start at 9:15 AM
+    end_time = dt.time(15, 30)   # End at 3:30 PM
+
+    time_list = []
+    current_time = dt.datetime.combine(dt.date.today(), start_time)
+
+    while current_time.time() <= end_time:
+        time_list.append(current_time.time())
+        current_time += dt.timedelta(minutes=15)
+        
+    current_time = dt.datetime.today().time() 
+
+    def closest_time(time_list, current_time):
+        closest = None
+        for t in time_list:
+            if t <= current_time:
+                closest = t
+            else:
+                break
+        return closest
+    
+    symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
+
+    while (dt.datetime.today().time() < dt.time(15,30)) & ((dt.datetime.today().time() > dt.time(9,15)):
+        # Get the closest time
+        closest = closest_time(time_list, current_time)
+        df = yf_downloader(symbol_list, current_date, closest)
+
     
     today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
     st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
