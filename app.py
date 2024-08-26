@@ -160,7 +160,6 @@ with tab5:
     close_df = result[0]
     volume_df = result[1]
     volume_series = volume_df.iloc[-1]
-    st.write(volume_df)
     today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
     st.header(f'Live Momentum Screen for {today_datetime.strftime('%H:%M')}, {today_datetime.day_name()}, {str(today_datetime.day)}, {today_datetime.month_name()}, {str(today_datetime.year)}')
     st.subheader('Nifty 500 List')
@@ -181,7 +180,7 @@ with tab5:
     for window in [1,3,5,10,20,60]:
         final[f'{str(window)}d_return'] = round((close_df.iloc[-1] - close_df.iloc[-1-window])*100/close_df.iloc[-1-window],2)
     for symbol in final.index:
-        final['volume_signal'] = volume_series.loc[symbol]
+        final.loc[symbol, 'volume_signal'] = volume_series.loc[symbol]
     fno_stocks = expiry_df.index
     fno_stocks = fno_stocks.intersection(final.index)
     final['is_fno'] = False
