@@ -173,10 +173,10 @@ with tab5:
     
     symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
 
-    while (dt.datetime.today().time() < dt.time(15,30)) & (dt.datetime.today().time() > dt.time(9,15)):
-        # Get the closest time
-        closest = closest_time(time_list, current_time)
-        df = yf_downloader(symbol_list, current_date, closest)
+    #while (dt.datetime.today().time() < dt.time(15,30)) & (dt.datetime.today().time() > dt.time(9,15)):
+    # Get the closest time
+    closest = closest_time(time_list, current_time)
+    df = yf_downloader(symbol_list, current_date, closest)
 
     
     today_datetime = pd.Timestamp(dt.datetime.today(),  tz='Asia/Kolkata')
