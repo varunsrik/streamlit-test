@@ -196,6 +196,6 @@ with tab5:
                 st.subheader(f'Stocks making a new {criterion}')  
                 st.dataframe(temp)
         
-        mom_button = st.button('Run Momentum Screen')
-        if mom_button:
-            output_momentum_screen()
+    mom_button = st.button('Run Momentum Screen')
+    if mom_button:
+        output_momentum_screen()
