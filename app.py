@@ -145,6 +145,7 @@ with tab4:
     st.plotly_chart(fig, use_container_width=True)
 
 with tab5:
+    symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
     def yf_downloader(symbol_list):
         symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
         df = yf.download(symbol_list_yf, start = '2023-1-1')[['Adj Close', 'Volume']]
@@ -155,7 +156,6 @@ with tab5:
         return [close_df, volume_df]
    
     def output_momentum_screen():
-        symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
         result = yf_downloader(symbol_list)
         st.write(result[0].index[-1])
         close_df = result[0]
