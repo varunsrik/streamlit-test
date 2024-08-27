@@ -145,7 +145,6 @@ with tab4:
     st.plotly_chart(fig, use_container_width=True)
 
 with tab5:
-    @st.cache_data   
     def yf_downloader(symbol_list):
         symbol_list_yf = [symbol+'.NS' for symbol in symbol_list]
         df = yf.download(symbol_list_yf, start = '2023-1-1')[['Adj Close', 'Volume']]
