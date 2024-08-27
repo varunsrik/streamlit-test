@@ -158,6 +158,7 @@ with tab5:
     def output_momentum_screen():
         symbol_list = pd.read_csv('nifty500list.csv')['Symbol'].to_list()
         result = yf_downloader(symbol_list)
+        st.write(result[0].index[-1])
         close_df = result[0]
         volume_df = result[1]
         volume_series = volume_df.iloc[-1]
