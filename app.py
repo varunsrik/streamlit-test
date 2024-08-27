@@ -155,7 +155,7 @@ with tab5:
         volume_df.columns = volume_df.columns.str.rstrip('.NS')
         return [close_df, volume_df]
    
-    def output_momentum_screen():
+    def output_momentum_screen(symb_list):
         result = yf_downloader(symb_list)
         close_df = result[0]
         volume_df = result[1]
@@ -197,4 +197,4 @@ with tab5:
         
     mom_button = st.button('Run Momentum Screen')
     if mom_button:
-        output_momentum_screen()
+        output_momentum_screen(symb_list)
