@@ -235,8 +235,8 @@ with tab6:
     freq = st.radio("Frequency", ('Weekly', 'Daily'))
 
     # Download data
-    end_date = datetime.datetime.now().date()
-    start_date = end_date - datetime.timedelta(weeks=52)
+    end_date = dt.datetime.now().date()
+    start_date = end_date - dt.timedelta(weeks=52)
 
     yf_sector_list = [sector_dict[sector] for sector in sectors]
     yf_sector_list = yf_sector_list.append(benchmark_dict[benchmark])
