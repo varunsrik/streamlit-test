@@ -224,7 +224,7 @@ with tab6:
                    'Nifty Metal': '^CNXMETAL',
                    'Nifty PSU Bank': '^CNXPSUBANK',
                    'Nifty PSE': '^CNXPSE',
-                   'Nifty Consumption': '^CNXCONSUM'
+                   'Nifty Consumption': '^CNXCONSUM',
                    'Nifty Realty': '^CNXREALTY'}
     benchmark_dict = {'Nifty': '^NSEI'}
                    
