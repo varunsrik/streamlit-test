@@ -233,16 +233,16 @@ with tab6:
     benchmark = st.selectbox('Select Benchmark',benchmark_dict.keys(), index=0)
     tail_length = st.slider('Tail Length (weeks)', 1, 15, 5)
     freq = st.radio("Frequency", ('Weekly', 'Daily'))
-
+    st.write(sectors, benchmark)
     # Download data
     end_date = dt.datetime.now().date()
     start_date = end_date - dt.timedelta(weeks=52)
 
     yf_sector_list = [sector_dict[sector] for sector in sectors]
     yf_sector_list = yf_sector_list.append(benchmark_dict[benchmark])
-    
+    st.write(yf_sector_list)
     prices = yf.download(yf_sector_list, start=start_date, end=end_date)['Adj Close']
-
+    st.write(prices)
     renamed_columns = sectors.append(benchmark)
     prices.columns = renamed_columns
     prices[sectors] = prices[sectors].div(prices[benchmark], axis=0)
