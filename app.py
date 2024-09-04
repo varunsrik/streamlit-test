@@ -243,16 +243,16 @@ with tab6:
     #yf_sector_list = yf_sector_list.append(benchmark_dict[benchmark])
     st.write(yf_sector_list)
     prices = yf.download(yf_sector_list, start=start_date, end=end_date)['Adj Close']
-    st.write(prices)
+  
     renamed_columns = sectors.append(benchmark)
     prices.columns = renamed_columns
     prices[sectors] = prices[sectors].div(prices[benchmark], axis=0)
-
+    st.write(prices)
     # Resample for weekly data if needed
     if freq == 'Weekly':
         prices = prices.resample('W-FRI').last()
 
-    
+    st.write(prices)
     # Calculate returns and relative strength
     returns = prices.pct_change().dropna()
     relative_strength = returns
