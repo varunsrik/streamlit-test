@@ -22,7 +22,7 @@ current_date = days.index[-1]
 
 st.header(f'FNO Dashboard for {current_date.day_name()}, {str(current_date.day)} {current_date.month_name()} {str(current_date.year)}')
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens", "Relative Rotation Graph"])
 
 with tab1:
     expiry_df = pd.read_csv('expiry_table.csv', index_col = 0)
@@ -198,3 +198,183 @@ with tab5:
     mom_button = st.button('Run Momentum Screen')
     if mom_button:
         output_momentum_screen(symb_list)
+
+with tab6:
+    
+# Function to calculate MACD and normalize it
+    def calc_macd(price, slow=26, fast=12, signal=9):
+        exp1 = price.ewm(span=fast, adjust=False).mean()
+        exp2 = price.ewm(span=slow, adjust=False).mean()
+        macd = exp1 - exp2
+        signal_line = macd.ewm(span=signal, adjust=False).mean()
+        normalized_macd = (macd - signal_line) / price
+        return normalized_macd
+
+
+    st.subheader('Relative Rotation Graph (RRG)')
+    sector_dict = {'Nifty Auto': '^CNXAUTO',
+                   'Nifty Commodities': '^CNXCMDT',
+                   'Bank Nifty': '^NSEBANK',
+                   'Nifty IT': '^CNXIT',
+                   'Nifty Infra': '^CNXINFRA',
+                   'Nifty Energy': '^CNXENERGY',
+                   'Nifty FMCG': ''^CNXFMCG',
+                   'Nifty Pharma': 'PHARMABEES.NS',
+                   'Nifty Media': '^CNXMEDIA',
+                   'Nifty Metal': '^CNXMETAL',
+                   'Nifty PSU Bank': '^CNXPSUBANK',
+                   'Nifty PSE': '^CNXPSE',
+                   'Nifty Consumption': '^CNXCONSUM'
+                   'Nifty Realty': '^CNXREALTY'}
+    benchmark_dict = {'Nifty': '^NSEI'}
+                   
+    
+    sectors = st.multiselect('Select Sectoral Indices', sector_dict.keys(), default=['Bank Nifty', 'Nifty IT'])
+    benchmark = st.selectbox('Select Benchmark',benchmark_dict.keys(), index=0)
+    tail_length = st.slider('Tail Length (weeks)', 1, 15, 5)
+    freq = st.radio("Frequency", ('Weekly', 'Daily'))
+
+    # Download data
+    end_date = datetime.datetime.now().date()
+    start_date = end_date - datetime.timedelta(weeks=52)
+
+    yf_sector_list = [sector_dict[sector] for sector in sectors]
+    yf_sector_list = yf_sector_list.append(benchmark_dict[benchmark])
+    
+    prices = yf.download(yf_sector_list, start=start_date, end=end_date)['Adj Close']
+
+    renamed_columns = sectors.append(benchmark)
+    prices.columns = renamed_columns
+    prices[sectors] = prices[sectors].div(prices[benchmark], axis=0)
+
+    # Resample for weekly data if needed
+    if freq == 'Weekly':
+        prices = prices.resample('W-FRI').last()
+
+    
+    # Calculate returns and relative strength
+    returns = prices.pct_change().dropna()
+    relative_strength = returns
+    lambda_func = lambda x: (x + 1).prod() - 1
+    relative_strength = relative_strength.rolling(window=4).apply(lambda_func, raw=True)
+
+
+
+
+    
+    #window = 1
+    #relative_strength = (returns - returns.rolling(window).mean())/returns.rolling(window).std()
+    #relative_strength = relative_strength.ewm(span=window).mean()
+    
+    # Calculate momentum for each sector
+    momentum = prices.apply(calc_macd)
+
+    
+    # Plotly figure setup for RRG
+    fig_rrg = go.Figure()
+    
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.max().max(), y1=momentum.max().max(),
+                      xref="x", yref="y",
+                      fillcolor="lightgreen", opacity=0.3, layer="below", line_width=0)
+    
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.max().max(), y1=momentum.min().min(),
+                      xref="x", yref="y",
+                      fillcolor="yellow", opacity=0.3, layer="below", line_width=0)
+    
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.min().min(), y1=momentum.min().min(),
+                      xref="x", yref="y",
+                      fillcolor="lightcoral", opacity=0.3, layer="below", line_width=0)
+    
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.min().min(), y1=momentum.max().max(),
+                      xref="x", yref="y",
+                      fillcolor="lightblue", opacity=0.3, layer="below", line_width=0)
+    
+    
+    
+    
+    for sector in sectors:
+        fig_rrg.add_trace(go.Scatter(
+            x=relative_strength[sector].tail(tail_length),
+            y=momentum[sector].tail(tail_length),
+            mode='lines+markers', line=dict(shape="spline"),
+            name=sector,
+            text=momentum.index[-tail_length:].strftime('%Y-%m-%d'),
+            hovertemplate='<b>Date:</b> %{text}<br><b>RS:</b> %{x}<br><b>Momentum:</b> %{y}<extra></extra>',
+            marker=dict(size=6),
+        ))
+    
+        # Highlight the last point
+        fig_rrg.add_trace(go.Scatter(
+            x=[relative_strength[sector].iloc[-1]],
+            y=[momentum[sector].iloc[-1]],
+            mode='markers+text',
+            text=[sector],
+            textposition='top right',
+            hovertext=[momentum.index[-1].strftime('%Y-%m-%d')],
+            hovertemplate='<b>Date:</b> %{hovertext}<br><b>RS:</b> %{x}<br><b>Momentum:</b> %{y}<extra></extra>',
+            marker=dict(size=12, symbol='diamond', color='red', line=dict(width=2, color='black')),
+            showlegend=False
+        ))
+    
+    fig_rrg.update_layout(
+        title='Relative Rotation Graph (RRG) with Normalized MACD Momentum',
+        xaxis_title='Relative Strength',
+        yaxis_title='Normalized Momentum (MACD)',
+        xaxis=dict(zeroline=True, zerolinewidth=2, zerolinecolor='black'),
+        yaxis=dict(zeroline=True, zerolinewidth=2, zerolinecolor='black'),
+        legend=dict(x=0.9, y=1),
+        width=800,
+        height=800,
+        template="plotly_white"
+    )
+    
+    # Add text annotations for each quadrant
+    fig_rrg.add_annotation(
+        text="Improving", xref="x domain", yref="y domain",
+        x=0.05, y=0.95, showarrow=False,
+        font=dict(size=16, color="black", family="Arial, sans-serif"))
+    
+    
+    fig_rrg.add_annotation(
+        text="Leading", xref="x domain", yref="y domain",
+        x=0.95, y=0.95, showarrow=False,
+        font=dict(size=16, color="black", family="Arial, sans-serif"),
+        xanchor="right")
+    
+    fig_rrg.add_annotation(
+        text="Weakening", xref="x domain", yref="y domain",
+        x=0.95, y=0.05, showarrow=False,
+        font=dict(size=16, color="black", family="Arial, sans-serif"),
+        xanchor="right", yanchor="bottom")
+    
+    fig_rrg.add_annotation(
+        text="Lagging", xref="x domain", yref="y domain",
+        x=0.05, y=0.05, showarrow=False,
+        font=dict(size=16, color="black", family="Arial, sans-serif"),
+        yanchor="bottom")
+    
+    
+    
+    # Display the initial plot
+    plot_rrg = st.plotly_chart(fig_rrg)
+    
+    # Animation feature using Streamlit buttons
+    if st.button('Animate'):
+        for i in range(1, tail_length + 1):
+            for j, sector in enumerate(sectors):
+                fig_rrg.data[2*j].update(
+                    x=relative_strength[sector].tail(i),
+                    y=momentum[sector].tail(i),
+                    text=momentum.index[-i:].strftime('%Y-%m-%d')
+                )
+                fig_rrg.data[2*j+1].update(
+                    x=[relative_strength[sector].iloc[-i]],
+                    y=[momentum[sector].iloc[-i]],
+                    hovertext=[momentum.index[-i].strftime('%Y-%m-%d')]
+                )
+            plot_rrg.plotly_chart(fig_rrg)
+            time.sleep(0.5)  # Add a delay for animation effect
+    
+
+
+
