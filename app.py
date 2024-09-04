@@ -218,7 +218,7 @@ with tab6:
                    'Nifty IT': '^CNXIT',
                    'Nifty Infra': '^CNXINFRA',
                    'Nifty Energy': '^CNXENERGY',
-                   'Nifty FMCG': ''^CNXFMCG',
+                   'Nifty FMCG': '^CNXFMCG',
                    'Nifty Pharma': 'PHARMABEES.NS',
                    'Nifty Media': '^CNXMEDIA',
                    'Nifty Metal': '^CNXMETAL',
