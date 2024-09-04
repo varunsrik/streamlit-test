@@ -238,7 +238,7 @@ with tab6:
     end_date = dt.datetime.now().date()
     start_date = end_date - dt.timedelta(weeks=52)
 
-    st.write(benchmark_dict[benchmark]))
+    st.write(benchmark_dict[benchmark])
     yf_sector_list = [sector_dict[sector] for sector in sectors]
     st.write(yf_sector_list)
     yf_sector_list = yf_sector_list.append(benchmark_dict[benchmark])
