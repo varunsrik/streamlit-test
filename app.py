@@ -279,15 +279,15 @@ with tab6:
                       xref="x", yref="y",
                       fillcolor="lightgreen", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.max().max(), y1=momentum.min().min(),
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.max().max()), y1=1.1*(momentum.min().min()),
                       xref="x", yref="y",
                       fillcolor="yellow", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.min().min(), y1=momentum.min().min(),
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.min().min()), y1=1.1*(momentum.min().min()),
                       xref="x", yref="y",
                       fillcolor="lightcoral", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.min().min(), y1=momentum.max().max(),
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.min().min()), y1=1.1*(momentum.max().max()),
                       xref="x", yref="y",
                       fillcolor="lightblue", opacity=0.3, layer="below", line_width=0)
     
