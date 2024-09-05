@@ -285,6 +285,7 @@ with tab6:
         relative_strength = relative_strength.resample('W-FRI').last()
         momentum = momentum.resample('W-FRI').last()
 
+    st.write('max rel strength', relative_strength.max().max())
     # Plotly figure setup for RRG
     fig_rrg = go.Figure()
     
