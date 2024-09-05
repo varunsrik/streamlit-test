@@ -245,24 +245,20 @@ with tab6:
     # Download data
     end_date = dt.datetime.now().date()
     start_date = end_date - dt.timedelta(weeks=52)
-
- 
+    
     yf_sector_list = [sector_dict[sector] for sector in sectors]
-
     yf_sector_list.append(benchmark_dict[benchmark])
-    st.write(yf_sector_list)
+    
     prices = yf.download(yf_sector_list, start=start_date, end=end_date)['Adj Close']
-    st.write(prices)
-
+    
     renamed_columns =  [inv_sector_dict[sector] for sector in list(prices.columns[:-1])]
     #renamed_columns = sectors
     
     renamed_columns.append(benchmark)
-    st.write(renamed_columns)
     
     prices.columns = renamed_columns
     prices[sectors] = prices[sectors].div(prices[benchmark], axis=0)
-    st.write(prices)
+    
     ## Calculate returns and relative strength
     #returns = prices.pct_change().dropna()
     #relative_strength = returns
@@ -278,18 +274,18 @@ with tab6:
     rs_mean = prices.rolling(period*5).mean()
     rs_mean = 100 + ((prices - rs_mean) / rs_mean) * 100
     relative_strength = rs_mean.rolling(window=period).mean()
-    st.write(relative_strength)
+   
 
     
     ## Calculate momentum for each sector
     #momentum = prices.apply(calc_macd)
     momentum = 100+((rs_mean - rs_mean.shift(period)) / rs_mean.shift(period) * 100)
-    st.write(momentum)
+
     if freq == 'Weekly':
         relative_strength = relative_strength.resample('W-FRI').last()
         momentum = momentum.resample('W-FRI').last()
 
-    st.write('max rel strength', relative_strength.max().max())
+
     # Plotly figure setup for RRG
     fig_rrg = go.Figure()
 
