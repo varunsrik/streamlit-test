@@ -244,7 +244,7 @@ with tab6:
     yf_sector_list.append(benchmark_dict[benchmark])
 
     prices = yf.download(yf_sector_list, start=start_date, end=end_date)['Adj Close']
-  
+    st.write(prices)
     renamed_columns = sectors
     renamed_columns.append(benchmark)
     st.write(renamed_columns)
