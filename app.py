@@ -275,7 +275,7 @@ with tab6:
     # Plotly figure setup for RRG
     fig_rrg = go.Figure()
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=relative_strength.max().max(), y1=momentum.max().max(),
+    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.max().max()), y1=1.1*(momentum.max().max()),
                       xref="x", yref="y",
                       fillcolor="lightgreen", opacity=0.3, layer="below", line_width=0)
     
