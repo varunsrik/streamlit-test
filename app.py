@@ -248,10 +248,10 @@ with tab6:
     renamed_columns = sectors
     renamed_columns.append(benchmark)
     st.write(renamed_columns)
-
+    
     prices.columns = renamed_columns
     prices[sectors] = prices[sectors].div(prices[benchmark], axis=0)
-
+    st.write(prices)
     ## Calculate returns and relative strength
     #returns = prices.pct_change().dropna()
     #relative_strength = returns
@@ -262,18 +262,18 @@ with tab6:
     #relative_strength = relative_strength.rolling(window=4).apply(lambda_func, raw=True)
     #relative_strength = (returns - returns.rolling(window).mean())/returns.rolling(window).std()
     #relative_strength = relative_strength.ewm(span=window).mean()
-
+    
     period = 10
     rs_mean = prices.rolling(period*5).mean()
     rs_mean = 100 + ((prices - rs_mean) / rs_mean) * 100
     relative_strength = rs_mean.rolling(window=period).mean()
-   
+    st.write(relative_strength)
 
     
     ## Calculate momentum for each sector
     #momentum = prices.apply(calc_macd)
     momentum = 100+((rs_mean - rs_mean.shift(period)) / rs_mean.shift(period) * 100)
-
+    st.write(momentum)
     if freq == 'Weekly':
         relative_strength = relative_strength.resample('W-FRI').last()
         momentum = momentum.resample('W-FRI').last()
