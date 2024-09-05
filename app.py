@@ -253,24 +253,32 @@ with tab6:
     prices[sectors] = prices[sectors].div(prices[benchmark], axis=0)
 
     # Resample for weekly data if needed
-    if freq == 'Weekly':
-        prices = prices.resample('W-FRI').last()
+    #if freq == 'Weekly':
+        #prices = prices.resample('W-FRI').last()
 
 
-    # Calculate returns and relative strength
-    returns = prices.pct_change().dropna()
-    relative_strength = returns
-    lambda_func = lambda x: (x + 1).prod() - 1
-    window = 4
-    relative_strength = (returns - returns.rolling(window).mean())/returns.rolling(window).std()
+    ## Calculate returns and relative strength
+    #returns = prices.pct_change().dropna()
+    #relative_strength = returns
+    #lambda_func = lambda x: (x + 1).prod() - 1
+    #window = 4
+    #relative_strength = (returns - returns.rolling(window).mean())/returns.rolling(window).std()
     
     #relative_strength = relative_strength.rolling(window=4).apply(lambda_func, raw=True)
     #relative_strength = (returns - returns.rolling(window).mean())/returns.rolling(window).std()
     #relative_strength = relative_strength.ewm(span=window).mean()
-    
-    # Calculate momentum for each sector
-    momentum = prices.apply(calc_macd)
 
+    period = 10
+    rs_mean = prices.rolling(period*5).mean()
+    rs_mean = 100 + ((prices - rs_mean) / rs_mean) * 100
+    relative_strength = rs_mean.rolling(window=period).mean()
+    
+    
+    
+    ## Calculate momentum for each sector
+    #momentum = prices.apply(calc_macd)
+    momentum = 100+((rs_mean - rs_mean.shift(period)) / rs_mean.shift(period) * 100)
+    
     
     # Plotly figure setup for RRG
     fig_rrg = go.Figure()
