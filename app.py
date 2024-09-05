@@ -226,6 +226,10 @@ with tab6:
                    'Nifty PSE': '^CNXPSE',
                    'Nifty Consumption': '^CNXCONSUM',
                    'Nifty Realty': '^CNXREALTY'}
+    
+    inv_sector_dict = {v: k for k, v in sector_dict.items()}
+
+    
     benchmark_dict = {'Nifty': '^NSEI'}
                    
     
@@ -245,7 +249,10 @@ with tab6:
     st.write(yf_sector_list)
     prices = yf.download(yf_sector_list, start=start_date, end=end_date)['Adj Close']
     st.write(prices)
-    renamed_columns = sectors
+
+    renamed_columns =  [inv_sector_dict[sector] for sector in list(prices.columns[:-1])]
+    #renamed_columns = sectors
+    
     renamed_columns.append(benchmark)
     st.write(renamed_columns)
     
