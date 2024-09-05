@@ -235,8 +235,12 @@ with tab6:
     
     sectors = st.multiselect('Select Sectoral Indices', sector_dict.keys(), default=['Bank Nifty', 'Nifty IT'])
     benchmark = st.selectbox('Select Benchmark',benchmark_dict.keys(), index=0)
-    tail_length = st.slider('Tail Length (weeks)', 1, 15, 5)
     freq = st.radio("Frequency", ('Weekly', 'Daily'))
+    if freq == 'Weekly:
+        tail_length = st.slider('Tail Length (weeks)', 1, 15, 5)
+    elif freq =='Daily':
+        tail_length = st.slider('Tail Length (Days)', 5, 30, 10)
+        
     
     # Download data
     end_date = dt.datetime.now().date()
