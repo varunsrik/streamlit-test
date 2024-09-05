@@ -248,26 +248,23 @@ with tab6:
     renamed_columns = sectors
     renamed_columns.append(benchmark)
     
-    st.write(renamed_columns)
+
     prices.columns = renamed_columns
     prices[sectors] = prices[sectors].div(prices[benchmark], axis=0)
-    st.write(prices)
+
     # Resample for weekly data if needed
     if freq == 'Weekly':
         prices = prices.resample('W-FRI').last()
 
-    st.write(prices)
+
     # Calculate returns and relative strength
     returns = prices.pct_change().dropna()
     relative_strength = returns
     lambda_func = lambda x: (x + 1).prod() - 1
-    relative_strength = relative_strength.rolling(window=4).apply(lambda_func, raw=True)
-
-
-
-
+    window = 4
+    relative_strength = (returns - returns.rolling(window).mean())/returns.rolling(window).std()
     
-    #window = 1
+    #relative_strength = relative_strength.rolling(window=4).apply(lambda_func, raw=True)
     #relative_strength = (returns - returns.rolling(window).mean())/returns.rolling(window).std()
     #relative_strength = relative_strength.ewm(span=window).mean()
     
