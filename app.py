@@ -272,30 +272,31 @@ with tab6:
     rs_mean = prices.rolling(period*5).mean()
     rs_mean = 100 + ((prices - rs_mean) / rs_mean) * 100
     relative_strength = rs_mean.rolling(window=period).mean()
-    
+
+    st.write(relative_strength)
     
     
     ## Calculate momentum for each sector
     #momentum = prices.apply(calc_macd)
     momentum = 100+((rs_mean - rs_mean.shift(period)) / rs_mean.shift(period) * 100)
-    
+    st.write(momentum)
     
     # Plotly figure setup for RRG
     fig_rrg = go.Figure()
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.max().max()), y1=1.1*(momentum.max().max()),
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=1.1*(relative_strength.max().max()), y1=1.1*(momentum.max().max()),
                       xref="x", yref="y",
                       fillcolor="lightgreen", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.max().max()), y1=1.1*(momentum.min().min()),
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=1.1*(relative_strength.max().max()), y1=1.1*(momentum.min().min()),
                       xref="x", yref="y",
                       fillcolor="yellow", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.min().min()), y1=1.1*(momentum.min().min()),
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=1.1*(relative_strength.min().min()), y1=1.1*(momentum.min().min()),
                       xref="x", yref="y",
                       fillcolor="lightcoral", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=0, y0=0, x1=1.1*(relative_strength.min().min()), y1=1.1*(momentum.max().max()),
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=1.1*(relative_strength.min().min()), y1=1.1*(momentum.max().max()),
                       xref="x", yref="y",
                       fillcolor="lightblue", opacity=0.3, layer="below", line_width=0)
     
