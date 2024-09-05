@@ -288,20 +288,21 @@ with tab6:
     st.write('max rel strength', relative_strength.max().max())
     # Plotly figure setup for RRG
     fig_rrg = go.Figure()
-    
-    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=1.02*(relative_strength.max().max()), y1=1.02*(momentum.max().max()),
+
+    tol = 0.01 #percentage tolerance for the shapes 
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=(1+tol)*(relative_strength.max().max()), y1=(1+tol)*(momentum.max().max()),
                       xref="x", yref="y",
                       fillcolor="lightgreen", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=1.02*(relative_strength.max().max()), y1=0.98*(momentum.min().min()),
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=(1+tol)*(relative_strength.max().max()), y1=(1-tol)*(momentum.min().min()),
                       xref="x", yref="y",
                       fillcolor="yellow", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=0.98*(relative_strength.min().min()), y1=0.98*(momentum.min().min()),
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=(1-tol)*(relative_strength.min().min()), y1=(1-tol)*(momentum.min().min()),
                       xref="x", yref="y",
                       fillcolor="lightcoral", opacity=0.3, layer="below", line_width=0)
     
-    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=0.98*(relative_strength.min().min()), y1=1.02*(momentum.max().max()),
+    fig_rrg.add_shape(type="rect", x0=100, y0=100, x1=(1-tol)*(relative_strength.min().min()), y1=(1+tol)*(momentum.max().max()),
                       xref="x", yref="y",
                       fillcolor="lightblue", opacity=0.3, layer="below", line_width=0)
     
