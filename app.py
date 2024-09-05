@@ -280,6 +280,7 @@ with tab6:
     #momentum = prices.apply(calc_macd)
     momentum = 100+((rs_mean - rs_mean.shift(period)) / rs_mean.shift(period) * 100)
     st.write(momentum)
+    st.write(momentum.max().max(), momentum.min().min(), relative_strength.max().max(), relative_strength.min().min())
     
     # Plotly figure setup for RRG
     fig_rrg = go.Figure()
