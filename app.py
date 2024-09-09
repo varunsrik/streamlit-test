@@ -416,7 +416,7 @@ with tab7:
     ma_df.index = pd.to_datetime(ma_df.index)
     st.write(ma_df)
 
-    threshold = st.number_input(min_value = 0.5, max_value = 0.95, value = 0.8)
+    threshold = st.number_input('enter the threshold', min_value = 0.5, max_value = 0.95, value = 0.8)
     lookback_period = 100
     touch_period = 5
     ma_screen_button = st.button('Run 200 day Moving Average Screen')
