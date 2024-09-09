@@ -22,7 +22,7 @@ current_date = days.index[-1]
 
 st.header(f'FNO Dashboard for {current_date.day_name()}, {str(current_date.day)} {current_date.month_name()} {str(current_date.year)}')
 
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens", "Relative Rotation Graph"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens", "Relative Rotation Graph", "Recent ma touches"])
 
 with tab1:
     expiry_df = pd.read_csv('expiry_table.csv', index_col = 0)
@@ -391,7 +391,11 @@ with tab6:
                 )
             plot_rrg.plotly_chart(fig_rrg)
             time.sleep(0.5)  # Add a delay for animation effect
-    
 
+with tab7:
+    ma_df = pd.read_csv(r'ma_200_signal.csv')
+    ma_df.index = pd.to_datetime(ma_df.index)
+    st.write(ma_df)
+                
 
 
