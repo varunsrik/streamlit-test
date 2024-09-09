@@ -393,9 +393,37 @@ with tab6:
             time.sleep(0.5)  # Add a delay for animation effect
 
 with tab7:
-    ma_df = pd.read_csv(r'ma_200_signal.csv')
+
+    
+    
+    def filter_stocks(df, filter_threshold, lookback_period, touch_period):
+        # Boolean mask for stocks that were mostly above the EMA in the last `lookback_period` days
+        recent_above = (df.tail(lookback_period) == 0).mean() > filter_threshold  # 80% of time above EMA
+        
+        # Boolean mask for stocks that touched the 200 EMA in the last `touch_period` days
+        recent_touch_close = (df.tail(touch_period) == 1).any()
+        recent_touch_low = (df.tail(touch_period) == 2).any()
+        
+        # Combine the two conditions
+        filtered_stocks_close = df.columns[recent_above & recent_touch_close]
+        filtered_stocks_low = df.columns[recent_above & recent_touch_low]
+        return [filtered_stocks_close, filtered_stocks_low]
+
+
+
+    
+    ma_df = pd.read_csv(r'ma_200_signal.csv', index_col = 0)
     ma_df.index = pd.to_datetime(ma_df.index)
     st.write(ma_df)
-                
+
+    threshold = st.number_input(min_value = 0.5, max_value = 0.95, value = 0.8)
+    lookback_period = 100
+    touch_period = 5
+    ma_screen_button = st.button('Run 200 day Moving Average Screen')
+    if ma_screen_button:
+        [close, low] = filter_stocks(ma_df, threshold, lookback_period, touch_period)
+
+    st.write('Stocks with a recent low below the 200 EMA and close above', close)
+    st.write('Stocks with a recent low and close below the 200 EMA', low)
 
 
