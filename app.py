@@ -422,8 +422,8 @@ with tab7:
     ma_screen_button = st.button('Run 200 day Moving Average Screen')
     if ma_screen_button:
         [close, low] = filter_stocks(ma_df, threshold, lookback_period, touch_period)
-
-    st.write('Stocks with a recent low below the 200 EMA and close above', close)
-    st.write('Stocks with a recent low and close below the 200 EMA', low)
-
+    
+        st.write('Stocks with a recent low below the 200 EMA and close above', close)
+        st.write('Stocks with a recent low and close below the 200 EMA', low)
+    
 
