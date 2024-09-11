@@ -429,12 +429,12 @@ with tab7:
         low_series = pd.Series(index = low)
         
         for col in close:
-            test = signal[col].iloc[-touch_period:]
+            test = ma_df[col].iloc[-touch_period:]
             close_series.loc[col] = test[test==1].index[-1].date().strftime('%d-%b-%Y')
         
         
         for col in low:
-            test = signal[col].iloc[-10:]
+            test = ma_df[col].iloc[-10:]
             low_series.loc[col] = test[test==2].index[-1].date().strftime('%d-%b-%Y')
     
 
