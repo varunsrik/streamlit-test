@@ -425,20 +425,23 @@ with tab7:
         for symbol in low.intersection(close):
             close = close.delete(close.get_loc(symbol))
             
-        close_series = pd.Series(index = close)
-        low_series = pd.Series(index = low)
+        close_series = pd.DataFrame(index = close, columns = ['first_touch_date', 'is_fno'])
+        low_series = pd.Dataframe(index = low,  columns = ['first_touch_date', 'is_fno'])
+        close_series['is_fno'] = False
+        low_series['is_fno'] = False
+        for symbol in expiry_df.index:
+            close_series.loc[symbol, 'is_fno'] = True
+            low_series.loc[symbol, 'is_fno'] = True
+            
         
         for col in close:
             test = ma_df[col].iloc[-touch_period:]
-            close_series.loc[col] = test[test==1].index[-1].date().strftime('%d-%b-%Y')
+            close_series.loc[col, 'first_touch_date'] = test[test==1].index[-1].date().strftime('%d-%b-%Y')
         
         
         for col in low:
             test = ma_df[col].iloc[-10:]
-            low_series.loc[col] = test[test==2].index[-1].date().strftime('%d-%b-%Y')
+            low_series.loc[col, 'first_touch_date'] = test[test==2].index[-1].date().strftime('%d-%b-%Y')
     
-
-        [close, low] = filter_stocks(ma_df, threshold, lookback_period, touch_period)
-        
         st.write('Stocks with a recent low below and close above 200 EMA in the last 5 days', close_series)
         st.write('Stocks with a recent low and close below 200 EMA in the last 5 days', low_series)
