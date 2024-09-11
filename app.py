@@ -433,11 +433,11 @@ with tab7:
             if symbol in expiry_df.index:
                 close_series.loc[symbol, 'is_fno'] = True
             
-         for symbol in low_series.index:
+        for symbol in low_series.index:
             if symbol in expiry_df.index:
                 low_series.loc[symbol, 'is_fno'] = True
             
-           
+
         
         for col in close:
             test = ma_df[col].iloc[-touch_period:]
