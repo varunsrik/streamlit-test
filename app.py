@@ -415,12 +415,7 @@ with tab7:
     ma_df = pd.read_csv(r'ma_200_signal.csv', index_col = 0)
     ma_df.index = pd.to_datetime(ma_df.index)
 
-    st.write('Screens for stocks in a bullish trend that have recently hit the 200D EMA.
-    We filter for bullishness by specifying:
-    (1) "threshold" (percentage of days in the lookback window spent above the 200D EMA. Default is 80%)
-    (2) Lookback window (default is 100) for the threshold
-    (3) Touch period window (default is 5) for touches of the EMA. i.e. any touch within the last 5 days is recorded')
-    
+    st.write('Screens for stocks in a bullish trend that have recently hit the 200D EMA. We filter for bullishness by specifying: \n (1) "threshold" (percentage of days in the lookback window spent above the 200D EMA. Default is 80%) \n (2) Lookback window (default is 100) for the threshold \n (3) Touch period window (default is 5) for touches of the EMA. i.e. any touch within the last 5 days is recorded')  
     threshold = st.number_input('enter the threshold', min_value = 0.5, max_value = 0.95, value = 0.8)
     lookback_period = 100
     touch_period = 5
