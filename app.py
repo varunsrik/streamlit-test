@@ -426,7 +426,7 @@ with tab7:
             close = close.delete(close.get_loc(symbol))
             
         close_series = pd.DataFrame(index = close, columns = ['first_touch_date', 'is_fno'])
-        low_series = pd.Dataframe(index = low,  columns = ['first_touch_date', 'is_fno'])
+        low_series = pd.DataFrame(index = low,  columns = ['first_touch_date', 'is_fno'])
         close_series['is_fno'] = False
         low_series['is_fno'] = False
         for symbol in expiry_df.index:
