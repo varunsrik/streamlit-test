@@ -414,7 +414,6 @@ with tab7:
     
     ma_df = pd.read_csv(r'ma_200_signal.csv', index_col = 0)
     ma_df.index = pd.to_datetime(ma_df.index)
-    st.write(ma_df)
 
     threshold = st.number_input('enter the threshold', min_value = 0.5, max_value = 0.95, value = 0.8)
     lookback_period = 100
@@ -425,5 +424,24 @@ with tab7:
     
         st.write('Stocks with a recent low below the 200 EMA and close above', close)
         st.write('Stocks with a recent low and close below the 200 EMA', low)
-    
 
+
+    
+    for symbol in low.intersection(close):
+        close = close.delete(close.get_loc(symbol))
+        
+    close_series = pd.Series(index = close)
+    low_series = pd.Series(index = low)
+    
+    for col in close:
+        test = signal[col].iloc[-touch_period:]
+        close_series.loc[col] = test[test==1].index[-1].date().strftime('%d-%b-%Y')
+    
+    
+    for col in low:
+        test = signal[col].iloc[-10:]
+        low_series.loc[col] = test[test==2].index[-1].date().strftime('%d-%b-%Y')
+
+
+    st.write(close_series)
+    st.write(low_series)
