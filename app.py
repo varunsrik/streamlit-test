@@ -429,10 +429,15 @@ with tab7:
         low_series = pd.DataFrame(index = low,  columns = ['first_touch_date', 'is_fno'])
         close_series['is_fno'] = False
         low_series['is_fno'] = False
-        for symbol in expiry_df.index:
-            close_series.loc[symbol, 'is_fno'] = True
-            low_series.loc[symbol, 'is_fno'] = True
+        for symbol in close_series.index:
+            if symbol in expiry_df.index:
+                close_series.loc[symbol, 'is_fno'] = True
             
+         for symbol in low_series.index:
+            if symbol in expiry_df.index:
+                low_series.loc[symbol, 'is_fno'] = True
+            
+           
         
         for col in close:
             test = ma_df[col].iloc[-touch_period:]
