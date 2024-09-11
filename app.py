@@ -421,27 +421,24 @@ with tab7:
     ma_screen_button = st.button('Run 200 day Moving Average Screen')
     if ma_screen_button:
         [close, low] = filter_stocks(ma_df, threshold, lookback_period, touch_period)
-    
-        st.write('Stocks with a recent low below the 200 EMA and close above', close)
-        st.write('Stocks with a recent low and close below the 200 EMA', low)
-
-
-    
-    for symbol in low.intersection(close):
-        close = close.delete(close.get_loc(symbol))
         
-    close_series = pd.Series(index = close)
-    low_series = pd.Series(index = low)
+        for symbol in low.intersection(close):
+            close = close.delete(close.get_loc(symbol))
+            
+        close_series = pd.Series(index = close)
+        low_series = pd.Series(index = low)
+        
+        for col in close:
+            test = signal[col].iloc[-touch_period:]
+            close_series.loc[col] = test[test==1].index[-1].date().strftime('%d-%b-%Y')
+        
+        
+        for col in low:
+            test = signal[col].iloc[-10:]
+            low_series.loc[col] = test[test==2].index[-1].date().strftime('%d-%b-%Y')
     
-    for col in close:
-        test = signal[col].iloc[-touch_period:]
-        close_series.loc[col] = test[test==1].index[-1].date().strftime('%d-%b-%Y')
-    
-    
-    for col in low:
-        test = signal[col].iloc[-10:]
-        low_series.loc[col] = test[test==2].index[-1].date().strftime('%d-%b-%Y')
 
-
-    st.write(close_series)
-    st.write(low_series)
+        [close, low] = filter_stocks(ma_df, threshold, lookback_period, touch_period)
+        
+        st.write('Stocks with a recent low below and close above 200 EMA in the last 5 days', close_series)
+        st.write('Stocks with a recent low and close below 200 EMA in the last 5 days', low_series)
