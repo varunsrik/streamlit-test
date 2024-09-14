@@ -334,9 +334,9 @@ with tab6:
         ))
     
     fig_rrg.update_layout(
-        title='Relative Rotation Graph (RRG) with Normalized MACD Momentum',
+        title='Relative Rotation Graph (RRG)',
         xaxis_title='Relative Strength',
-        yaxis_title='Normalized Momentum (MACD)',
+        yaxis_title='Relative Strength Momentum',
         xaxis=dict(zeroline=True, zerolinewidth=2, zerolinecolor='black'),
         yaxis=dict(zeroline=True, zerolinewidth=2, zerolinecolor='black'),
         legend=dict(x=0.9, y=1),
