@@ -455,7 +455,7 @@ with tab7:
 
 with tab8:
     st.subheader('Implied Volatility')
-    
+        
     # Sample DataFrame creation for the example
     straddle_df = pd.DataFrame({
         'Ticker': ['TATASTEEL', 'MCX', 'NATIONALUM', 'BIOCON', 'LT', 'HINDALCO', 'MOTHERSON', 'SHRIRAMFIN'],
@@ -470,12 +470,14 @@ with tab8:
     })
     
     # Create a grid for the heatmap
-    # Create a rectangular grid based on the number of stocks
+    # Set the number of columns
+    num_columns = 4  
     num_stocks = len(straddle_df)
-    num_columns = 4  # Number of columns in the heatmap
-    num_rows = (num_stocks + num_columns - 1) // num_columns  # Calculate the number of rows needed
     
-    # Add padding for the grid if necessary
+    # Calculate the number of rows required for the grid
+    num_rows = (num_stocks + num_columns - 1) // num_columns  
+    
+    # Add padding to match grid size if necessary
     pad_length = num_rows * num_columns - num_stocks
     if pad_length > 0:
         pad_df = pd.DataFrame({
@@ -491,8 +493,8 @@ with tab8:
         })
         straddle_df = pd.concat([straddle_df, pad_df], ignore_index=True)
     
-    # Reshape the DataFrame into a grid for heatmap
-    reshaped_df = straddle_df[['Ticker', 'Change_pct']].values.reshape(num_rows, num_columns)
+    # Reshape the DataFrame into a grid for the heatmap
+    reshaped_df = straddle_df['Change_pct'].values.reshape(num_rows, num_columns)
     
     # Create hover information for each stock
     hover_text = []
@@ -505,14 +507,14 @@ with tab8:
         else:
             hover_text.append('')
     
-    # Reshape the hover text into a grid
+    # Reshape hover text into a grid
     hover_text = np.array(hover_text).reshape(num_rows, num_columns)
     
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
         z=straddle_df['Change_pct'].fillna(0).values.reshape(num_rows, num_columns),  # Heatmap color data
-        x=[f"Col {i}" for i in range(num_columns)],  # Placeholder for columns
-        y=[f"Row {i}" for i in range(num_rows)],  # Placeholder for rows
+        x=[f"Stock {i+1}" for i in range(num_columns)],  # Placeholder for columns
+        y=[f"Row {i+1}" for i in range(num_rows)],  # Placeholder for rows
         text=hover_text,  # Hover text for each tile
         hoverinfo='text',
         colorscale='RdYlGn',  # Green for up, red for down
@@ -535,6 +537,3 @@ with tab8:
     
     # Show the Plotly heatmap in Streamlit
     st.plotly_chart(fig, use_container_width=True)
-    
-        
-        
