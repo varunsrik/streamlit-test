@@ -22,7 +22,7 @@ current_date = days.index[-1]
 
 st.header(f'FNO Dashboard for {current_date.day_name()}, {str(current_date.day)} {current_date.month_name()} {str(current_date.year)}')
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens", "Relative Rotation Graph", "Recent ma touches"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens", "Relative Rotation Graph", "Recent ma touches", "Volatility Tracker"])
 
 with tab1:
     expiry_df = pd.read_csv('expiry_table.csv', index_col = 0)
@@ -451,3 +451,60 @@ with tab7:
     
         st.write('Stocks with a recent low below and close above 200 EMA in the last 5 days', close_series)
         st.write('Stocks with a recent low and close below 200 EMA in the last 5 days', low_series)
+
+with tab8:
+    st.subheader('Implied Volatility')
+
+    
+    # Sample DataFrame creation for the example
+    # Assume straddle_df is the data from a CSV file
+    straddle_df = pd.DataFrame({
+        'Ticker': ['TATASTEEL', 'MCX', 'NATIONALUM', 'BIOCON', 'LT', 'HINDALCO', 'MOTHERSON', 'SHRIRAMFIN'],
+        'Price': [154.83, 5672.00, 186.98, 391.70, 3677.70, 685.00, 193.60, 3421.80],
+        'Change': [0.92, 6.67, 3.44, 3.27, 1.63, 1.48, 1.35, 1.29],
+        'Change_pct': [0.60, 6.67, 3.44, 3.27, 1.63, 1.48, 1.35, 1.29],
+        'OI': [262416000, 56720000, 18698000, 39170000, 36777000, 6850000, 19360000, 34218000],
+        'Contracts': [11093, 10500, 9800, 9200, 8700, 8200, 7800, 7500],
+        'Futures': [154.83, 5672.00, 186.98, 391.70, 3677.70, 685.00, 193.60, 3421.80],
+        'Spot': [154.35, 5670.00, 186.00, 391.00, 3670.00, 680.00, 193.00, 3415.00],
+        'Basis': [0.48, 2.00, 0.98, 0.70, 0.60, 0.50, 0.40, 0.30]
+    })
+    
+    # Create a heatmap using Plotly Express
+    fig = px.imshow(
+        straddle_df.pivot(index='Ticker', columns='Ticker', values='Change_pct'),
+        text_auto=True,
+        labels=dict(x="Ticker", y="Ticker", color="Change %"),
+        title="Stock Price Change % Heatmap"
+    )
+    
+    # Update layout for better visualization
+    fig.update_layout(
+        xaxis_title="Stock Ticker",
+        yaxis_title="Stock Ticker",
+        xaxis_showgrid=False,
+        yaxis_showgrid=False,
+        xaxis_nticks=len(straddle_df['Ticker']),
+        yaxis_nticks=len(straddle_df['Ticker'])
+    )
+    
+    # Add hover information
+    fig.update_traces(
+        hoverinfo="text",
+        hovertemplate="<b>Ticker:</b> %{x}<br>" +
+                      "<b>Price:</b> %{customdata[0]}<br>" +
+                      "<b>Change:</b> %{customdata[1]}<br>" +
+                      "<b>Change %:</b> %{customdata[2]}<br>" +
+                      "<b>OI:</b> %{customdata[3]}<br>" +
+                      "<b>Contracts:</b> %{customdata[4]}<br>" +
+                      "<b>Futures:</b> %{customdata[5]}<br>" +
+                      "<b>Spot:</b> %{customdata[6]}<br>" +
+                      "<b>Basis:</b> %{customdata[7]}",
+        customdata=straddle_df[['Price', 'Change', 'Change_pct', 'OI', 'Contracts', 'Futures', 'Spot', 'Basis']].values
+    )
+    
+    # Show the Plotly heatmap in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+    
+    
+    
