@@ -455,10 +455,8 @@ with tab7:
 
 with tab8:
     st.subheader('Implied Volatility')
-
     
     # Sample DataFrame creation for the example
-    # Assume straddle_df is the data from a CSV file
     straddle_df = pd.DataFrame({
         'Ticker': ['TATASTEEL', 'MCX', 'NATIONALUM', 'BIOCON', 'LT', 'HINDALCO', 'MOTHERSON', 'SHRIRAMFIN'],
         'Price': [154.83, 5672.00, 186.98, 391.70, 3677.70, 685.00, 193.60, 3421.80],
@@ -471,41 +469,72 @@ with tab8:
         'Basis': [0.48, 2.00, 0.98, 0.70, 0.60, 0.50, 0.40, 0.30]
     })
     
-    # Create a heatmap using Plotly Express
-    fig = px.imshow(
-        straddle_df.pivot(index='Ticker', columns='Ticker', values='Change_pct'),
-        text_auto=True,
-        labels=dict(x="Ticker", y="Ticker", color="Change %"),
-        title="Stock Price Change % Heatmap"
-    )
+    # Create a grid for the heatmap
+    # Create a rectangular grid based on the number of stocks
+    num_stocks = len(straddle_df)
+    num_columns = 4  # Number of columns in the heatmap
+    num_rows = (num_stocks + num_columns - 1) // num_columns  # Calculate the number of rows needed
     
-    # Update layout for better visualization
+    # Add padding for the grid if necessary
+    pad_length = num_rows * num_columns - num_stocks
+    if pad_length > 0:
+        pad_df = pd.DataFrame({
+            'Ticker': [None] * pad_length,
+            'Price': [None] * pad_length,
+            'Change': [None] * pad_length,
+            'Change_pct': [None] * pad_length,
+            'OI': [None] * pad_length,
+            'Contracts': [None] * pad_length,
+            'Futures': [None] * pad_length,
+            'Spot': [None] * pad_length,
+            'Basis': [None] * pad_length
+        })
+        straddle_df = pd.concat([straddle_df, pad_df], ignore_index=True)
+    
+    # Reshape the DataFrame into a grid for heatmap
+    reshaped_df = straddle_df[['Ticker', 'Change_pct']].values.reshape(num_rows, num_columns)
+    
+    # Create hover information for each stock
+    hover_text = []
+    for i, row in straddle_df.iterrows():
+        if pd.notna(row['Ticker']):
+            hover_text.append(
+                f"<b>{row['Ticker']}</b><br>Price: {row['Price']}<br>Change: {row['Change']}<br>Change %: {row['Change_pct']}<br>" +
+                f"OI: {row['OI']}<br>Contracts: {row['Contracts']}<br>Futures: {row['Futures']}<br>Spot: {row['Spot']}<br>Basis: {row['Basis']}"
+            )
+        else:
+            hover_text.append('')
+    
+    # Reshape the hover text into a grid
+    hover_text = np.array(hover_text).reshape(num_rows, num_columns)
+    
+    # Create the heatmap
+    fig = go.Figure(data=go.Heatmap(
+        z=straddle_df['Change_pct'].fillna(0).values.reshape(num_rows, num_columns),  # Heatmap color data
+        x=[f"Col {i}" for i in range(num_columns)],  # Placeholder for columns
+        y=[f"Row {i}" for i in range(num_rows)],  # Placeholder for rows
+        text=hover_text,  # Hover text for each tile
+        hoverinfo='text',
+        colorscale='RdYlGn',  # Green for up, red for down
+        zmin=straddle_df['Change_pct'].min(),  # Minimum value for color scaling
+        zmax=straddle_df['Change_pct'].max()   # Maximum value for color scaling
+    ))
+    
+    # Update layout for better display
     fig.update_layout(
-        xaxis_title="Stock Ticker",
-        yaxis_title="Stock Ticker",
+        title='Stock Price Change % Heatmap',
+        xaxis_title='Stocks',
+        yaxis_title='',
         xaxis_showgrid=False,
         yaxis_showgrid=False,
-        xaxis_nticks=len(straddle_df['Ticker']),
-        yaxis_nticks=len(straddle_df['Ticker'])
-    )
-    
-    # Add hover information
-    fig.update_traces(
-        hoverinfo="text",
-        hovertemplate="<b>Ticker:</b> %{x}<br>" +
-                      "<b>Price:</b> %{customdata[0]}<br>" +
-                      "<b>Change:</b> %{customdata[1]}<br>" +
-                      "<b>Change %:</b> %{customdata[2]}<br>" +
-                      "<b>OI:</b> %{customdata[3]}<br>" +
-                      "<b>Contracts:</b> %{customdata[4]}<br>" +
-                      "<b>Futures:</b> %{customdata[5]}<br>" +
-                      "<b>Spot:</b> %{customdata[6]}<br>" +
-                      "<b>Basis:</b> %{customdata[7]}",
-        customdata=straddle_df[['Price', 'Change', 'Change_pct', 'OI', 'Contracts', 'Futures', 'Spot', 'Basis']].values
+        yaxis_nticks=num_rows,
+        xaxis_nticks=num_columns,
+        width=800,
+        height=600
     )
     
     # Show the Plotly heatmap in Streamlit
     st.plotly_chart(fig, use_container_width=True)
     
-    
-    
+        
+        
