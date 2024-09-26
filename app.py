@@ -457,21 +457,34 @@ with tab8:
     st.subheader('Implied Volatility')
         
     # Sample DataFrame creation for the example
+    straddles_csv = pd.read_csv('stock_straddles.csv', index_col = 0)
+    straddles_csv.index = pd.to_datetime(straddles_csv.index)
+    heatmap_symbols = straddles_csv.columns[straddles_csv.columns.str.contains('front_straddle_price')].str.rstrip('front_straddle_price').to_list()
+    
+    price_mask = straddles_csv.columns[straddles_csv.columns.str.contains('front_straddle_price')]
+    iv_mask = straddles_csv.columns[straddles_csv.columns.str.contains('front_straddle_iv')]
+    strike_mask = straddles_csv.columns[straddles_csv.columns.str.contains('front_straddle_strike')]
+    
+    prev_straddle_prices = straddles_csv[price_mask].iloc[-2]
+    current_straddle_prices = straddles_csv[price_mask].iloc[-1]
+    price_change = current_straddle_prices - prev_straddle_prices 
+    price_change_pct = round(price_change*100/prev_straddle_prices,1)
+    straddle_strike = straddles_csv[strike_mask].iloc[-1]
+    straddle_iv = straddles_csv[iv_mask].iloc[-1]
+    
+        
+    
     straddle_df = pd.DataFrame({
-        'Ticker': ['TATASTEEL', 'MCX', 'NATIONALUM', 'BIOCON', 'LT', 'HINDALCO', 'MOTHERSON', 'SHRIRAMFIN'],
-        'Price': [154.83, 5672.00, 186.98, 391.70, 3677.70, 685.00, 193.60, 3421.80],
-        'Change': [0.92, 6.67, 3.44, 3.27, 1.63, 1.48, 1.35, 1.29],
-        'Change_pct': [0.60, 6.67, 3.44, 3.27, 1.63, 1.48, 1.35, 1.29],
-        'OI': [262416000, 56720000, 18698000, 39170000, 36777000, 6850000, 19360000, 34218000],
-        'Contracts': [11093, 10500, 9800, 9200, 8700, 8200, 7800, 7500],
-        'Futures': [154.83, 5672.00, 186.98, 391.70, 3677.70, 685.00, 193.60, 3421.80],
-        'Spot': [154.35, 5670.00, 186.00, 391.00, 3670.00, 680.00, 193.00, 3415.00],
-        'Basis': [0.48, 2.00, 0.98, 0.70, 0.60, 0.50, 0.40, 0.30]
-    })
+        'Ticker': heatmap_symbols,
+        'Price': current_straddle_prices,
+        'Change': price_change,
+        'Change_pct': price_change_pct,
+        'Straddle Strike': straddle_strike,
+        'Straddle IV': straddle_iv})
     
     # Create a grid for the heatmap
     # Set the number of columns
-    num_columns = 4  
+    num_columns = 6
     num_stocks = len(straddle_df)
     
     # Calculate the number of rows required for the grid
@@ -485,11 +498,8 @@ with tab8:
             'Price': [None] * pad_length,
             'Change': [None] * pad_length,
             'Change_pct': [None] * pad_length,
-            'OI': [None] * pad_length,
-            'Contracts': [None] * pad_length,
-            'Futures': [None] * pad_length,
-            'Spot': [None] * pad_length,
-            'Basis': [None] * pad_length
+            'Straddle Strike': [None] * pad_length,
+            'Straddle IV': [None] * pad_length
         })
         straddle_df = pd.concat([straddle_df, pad_df], ignore_index=True)
     
@@ -502,7 +512,7 @@ with tab8:
         if pd.notna(row['Ticker']):
             hover_text.append(
                 f"<b>{row['Ticker']}</b><br>Price: {row['Price']}<br>Change: {row['Change']}<br>Change %: {row['Change_pct']}<br>" +
-                f"OI: {row['OI']}<br>Contracts: {row['Contracts']}<br>Futures: {row['Futures']}<br>Spot: {row['Spot']}<br>Basis: {row['Basis']}"
+                f"Straddle Strike: {row['Straddle Strike']}<br>Straddle IV: {row['Straddle IV']}"
             )
         else:
             hover_text.append('')
