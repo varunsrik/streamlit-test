@@ -467,12 +467,11 @@ with tab8:
     
     prev_straddle_prices = straddles_csv[price_mask].iloc[-2]
     current_straddle_prices = straddles_csv[price_mask].iloc[-1]
-    price_change = current_straddle_prices - prev_straddle_prices 
+    price_change = round(current_straddle_prices - prev_straddle_prices,2)
     price_change_pct = round(price_change*100/prev_straddle_prices,1)
     straddle_strike = straddles_csv[strike_mask].iloc[-1]
-    straddle_iv = straddles_csv[iv_mask].iloc[-1]
-    st.write(len(heatmap_symbols), len(prev_straddle_prices), len(prev_straddle_prices), len(current_straddle_prices), len(price_change_pct), len(straddle_strike), len(straddle_iv))
-        
+    straddle_iv = round(straddles_csv[iv_mask].iloc[-1],1)
+
     straddle_df = pd.DataFrame({
         'Ticker': heatmap_symbols,
         'Price': current_straddle_prices.values,
