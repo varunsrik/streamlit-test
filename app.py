@@ -475,11 +475,11 @@ with tab8:
         
     straddle_df = pd.DataFrame({
         'Ticker': heatmap_symbols,
-        'Price': current_straddle_prices,
-        'Change': price_change,
-        'Change_pct': price_change_pct,
-        'Straddle Strike': straddle_strike,
-        'Straddle IV': straddle_iv})
+        'Price': current_straddle_prices.values,
+        'Change': price_change.values,
+        'Change_pct': price_change_pct.values,
+        'Straddle Strike': straddle_strike.values,
+        'Straddle IV': straddle_iv.values})
 
     st.write(straddle_df)
     # Create a grid for the heatmap
