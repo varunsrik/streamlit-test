@@ -537,7 +537,7 @@ with tab8:
                         xref='x1',  # Reference the x-axis
                         yref='y1',  # Reference the y-axis
                         showarrow=False,  # No arrow pointing
-                        font=dict(color='black', size=12, family="Arial", bold=True),  # Always black and bold
+                        font=dict(color='black', size=12, family="Arial", weight='bold'),  # Always black and bold
                         xanchor='center',
                         yanchor='middle'
                     )
