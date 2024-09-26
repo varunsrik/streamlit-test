@@ -471,7 +471,7 @@ with tab8:
     price_change_pct = round(price_change*100/prev_straddle_prices,1)
     straddle_strike = straddles_csv[strike_mask].iloc[-1]
     straddle_iv = straddles_csv[iv_mask].iloc[-1]
-    
+    st.write(len(heatmap_symbols), len(prev_straddle_prices))
         
     
     straddle_df = pd.DataFrame({
@@ -481,7 +481,8 @@ with tab8:
         'Change_pct': price_change_pct,
         'Straddle Strike': straddle_strike,
         'Straddle IV': straddle_iv})
-    
+
+    st.write(straddle_df)
     # Create a grid for the heatmap
     # Set the number of columns
     num_columns = 6
