@@ -505,7 +505,9 @@ with tab8:
     
     # Reshape the DataFrame into a grid for the heatmap
     reshaped_df = straddle_df['Change_pct'].values.reshape(num_rows, num_columns)
-    
+    reshaped_change_pct = straddle_df['Change_pct'].fillna(0).values.reshape(num_rows, num_columns)
+    reshaped_tickers = straddle_df['Ticker'].values.reshape(num_rows, num_columns)
+
     # Create hover information for each stock
     hover_text = []
     for i, row in straddle_df.iterrows():
@@ -519,6 +521,30 @@ with tab8:
     
     # Reshape hover text into a grid
     hover_text = np.array(hover_text).reshape(num_rows, num_columns)
+
+  
+    # Add the ticker names as annotations (text) on the heatmap
+    annotations = []
+    for i in range(num_rows):
+        for j in range(num_columns):
+            ticker = reshaped_tickers[i, j]
+            if ticker:  # Only add annotation if the ticker is not None
+                annotations.append(
+                    go.layout.Annotation(
+                        text=ticker,  # Display the Ticker name
+                        x=j,  # x-coordinate (column index)
+                        y=i,  # y-coordinate (row index)
+                        xref='x1',  # Reference the x-axis
+                        yref='y1',  # Reference the y-axis
+                        showarrow=False,  # No arrow pointing
+                        font=dict(color='black' if reshaped_change_pct[i, j] > 0 else 'white'),  # Adjust font color based on tile color
+                        xanchor='center',
+                        yanchor='middle'
+                    )
+                )
+
+
+
     
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
@@ -542,7 +568,8 @@ with tab8:
         yaxis_nticks=num_rows,
         xaxis_nticks=num_columns,
         width=800,
-        height=600
+        height=600,
+        annotations=annotations
     )
     
     # Show the Plotly heatmap in Streamlit
