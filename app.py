@@ -24,7 +24,7 @@ current_date = days.index[-1]
 
 st.header(f'FNO Dashboard for {current_date.day_name()}, {str(current_date.day)} {current_date.month_name()} {str(current_date.year)}')
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens", "Relative Rotation Graph", "Recent ma touches", "Volatility Tracker"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs(["Expiry Comparison", "Backwardation", "Industry", "Stock Details", "Momentum Screens", "Relative Rotation Graph", "Recent ma touches", "Volatility Tracker", "Live Straddle"])
 
 with tab1:
     expiry_df = pd.read_csv('expiry_table.csv', index_col = 0)
