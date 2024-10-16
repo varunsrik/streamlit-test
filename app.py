@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import time
 import pytz
+import nsepython
 
 
 days = pd.read_csv('trading_days.csv', index_col = 0)
@@ -573,3 +574,38 @@ with tab8:
     
     # Show the Plotly heatmap in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+
+
+
+with tab9:
+    st.subheader('Live Straddles')
+    
+    
+    def retrieve_live_straddle(symbol):
+        final = pd.DataFrame(columns = ['CE', 'PE'])
+        test = nsepython.option_chain(symbol)
+        underlying = test['records']['underlyingValue']
+        test_list = test['filtered']['data']
+        
+        for i in range(len(test_list)):
+            try:
+                strike = test_list[i]['strikePrice']
+                if (strike <=1.05*underlying)&(strike >=0.95*underlying):
+                    ce_price = test_list[i]['CE']['lastPrice']
+                    pe_price = test_list[i]['PE']['lastPrice']
+                    final.loc[strike] = [ce_price, pe_price]
+            except:
+                print(f'error for {i}')
+        
+        
+        final['price_diff'] = abs(final['CE']-final['PE'])
+        atm_strike = final[final['price_diff']==final['price_diff'].min()]
+        straddle_price = (atm_strike['CE']+atm_strike['PE']).values[0]
+        straddle_strike = atm_strike.index[0]
+    
+        return [straddle_price, straddle_strike]
+
+
+    print(retrieve_live_straddle('TCS'))
+
+        
