@@ -39,14 +39,21 @@ with tab1:
     
     for col in live_prices.columns:
         current_price = live_prices.iloc[-1].loc[col]
+        prev_expiry_close =  expiry_df.loc[col, 'prev_expiry_close']
+        prev_expiry_high =  expiry_df.loc[col, 'prev_expiry_high']
         final.loc[col, 'current_price'] = current_price
         signal = 'None'
-        if current_price > expiry_df.loc[col, 'prev_expiry_high']:
+        if current_price > prev_expiry_high:
             signal = 'price above high'
-        elif current_price > expiry_df.loc[col, 'prev_expiry_close']:
+        elif current_price > prev_expiry_close:
             signal = 'price above close'
-        
         final.loc[col, 'signal'] = signal
+        pct_from_close = (current_price - prev_expiry_close)*100/prev_expiry_close
+        
+        final.loc[col, 'pct_from_close'] = pct_from_close
+
+        
+        
       
     st.dataframe(final)
     
