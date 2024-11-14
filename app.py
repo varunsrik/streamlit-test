@@ -48,7 +48,7 @@ with tab1:
         
         final.loc[col, 'signal'] = signal
       
-    st.write(final)
+    st.dataframe(final)
     
     st.dataframe(expiry_df)
 
