@@ -28,7 +28,17 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs(["Expiry Comparis
 
 with tab1:
     expiry_df = pd.read_csv('expiry_table.csv', index_col = 0)
+
+    st.subheader('Live Prices')
+    symb_list = list(expiry_df.index)
+    yf_list = [symbol+'.NS' for symbol in symb_list]
+    live_prices = yf.download(yf_list, start = '2024-9-1')['Adj Close']
+    live_prices.columns = live_prices.columns.str[:-3]
+    st.write(live_prices)
+    
     st.dataframe(expiry_df)
+
+    
     
     oi_up_backwardation = expiry_df[(expiry_df['oi_pct_change']>0)&(expiry_df['current_basis']<0)]
     oi_down_backwardation = expiry_df[(expiry_df['oi_pct_change']<0)&(expiry_df['current_basis']<0)]
