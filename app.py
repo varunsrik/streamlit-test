@@ -34,7 +34,21 @@ with tab1:
     yf_list = [symbol+'.NS' for symbol in symb_list]
     live_prices = yf.download(yf_list, start = '2024-9-1')['Adj Close']
     live_prices.columns = live_prices.columns.str[:-3]
-    st.write(live_prices)
+
+    final = expiry_df[['prev_expiry_close', 'prev_expiry_high']]
+    
+    for col in live_prices.columns:
+        current_price = live_prices.iloc[-1].loc[col]
+        final.loc[col, 'current_price'] = current_price
+        signal = 'None'
+        if current_price > expiry_df.loc[col, 'prev_expiry_high']:
+            signal = 'price above high'
+        elif current_price > expiry_df.loc[col, 'prev_expiry_close']:
+            signal = 'price above close'
+        
+        final.loc[col, 'signal'] = signal
+      
+    st.write(final)
     
     st.dataframe(expiry_df)
 
