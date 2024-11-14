@@ -48,7 +48,7 @@ with tab1:
         elif current_price > prev_expiry_close:
             signal = 'price above close'
         final.loc[col, 'signal'] = signal
-        pct_from_close = (current_price - prev_expiry_close)*100/prev_expiry_close
+        pct_from_close = round((current_price - prev_expiry_close)*100/prev_expiry_close,2)
         
         final.loc[col, 'pct_from_close'] = pct_from_close
 
