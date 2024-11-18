@@ -1,4 +1,0 @@
-yfinance
-plotly
-pytz
-nsepython
